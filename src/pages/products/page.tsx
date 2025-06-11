@@ -1,5 +1,4 @@
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
+import { MainLayout } from '@/layouts';
 import React from 'react';
 import ProductBanner from './components/ProductBanner';
 import ProductBreadcrumb from './components/ProductBreadcrumb';
@@ -9,8 +8,7 @@ import ProductPagination from './components/ProductPagination';
 
 const ProductPage: React.FC = () => {
 	return (
-		<div className="bg-white text-black">
-			<Header />
+		<MainLayout fullWidth>
 			<ProductBanner />
 			<div className="max-w-7xl mx-auto px-6">
 				<ProductBreadcrumb />
@@ -20,8 +18,7 @@ const ProductPage: React.FC = () => {
 				</div>
 				<ProductPagination />
 			</div>
-			<Footer />
-		</div>
+		</MainLayout>
 	);
 };
 

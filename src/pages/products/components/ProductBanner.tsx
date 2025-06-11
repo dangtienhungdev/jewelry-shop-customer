@@ -5,10 +5,8 @@ const ProductBanner: React.FC = () => {
 		<div className="w-full">
 			<img
 				alt="Jewelry rings arranged on a wooden surface with a wooden geometric vase holding dried flowers on the right"
-				className="w-full object-cover"
-				height={200}
-				src="https://storage.googleapis.com/a1aa/image/a072351c-2c41-41af-586c-ec094a4e826d.jpg"
-				width={1440}
+				className="w-full object-contain h-[400px]"
+				src="https://res.cloudinary.com/dcwdrvxdg/image/upload/v1749659045/image_1_ee0h3r.png"
 			/>
 		</div>
 	);

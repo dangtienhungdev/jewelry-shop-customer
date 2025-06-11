@@ -1,0 +1,356 @@
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>
+    Checkout Page
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter&amp;display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-white text-gray-900">
+  <header class="flex items-center justify-between px-6 py-6 max-w-[1280px] mx-auto">
+    <div class="text-lg font-normal">
+      Logo
+    </div>
+    <nav class="hidden md:flex space-x-16 text-sm font-normal text-[#1B3B5B]">
+      <a class="hover:underline" href="#">
+        TRANG CHỦ
+      </a>
+      <a class="hover:underline" href="#">
+        SẢN PHẨM
+      </a>
+      <a class="hover:underline" href="#">
+        THÔNG TIN
+      </a>
+      <a class="hover:underline" href="#">
+        HỆ THỐNG
+      </a>
+    </nav>
+    <div class="flex space-x-6 text-black text-lg">
+      <button aria-label="Cart" class="focus:outline-none">
+        <i class="fas fa-shopping-cart">
+        </i>
+      </button>
+      <button aria-label="User" class="focus:outline-none">
+        <i class="fas fa-user">
+        </i>
+      </button>
+    </div>
+  </header>
+  <main class="max-w-[1280px] mx-auto px-6 mb-24">
+    <section class="mb-8 text-xs text-[#1B3B5B] font-normal">
+      <div class="flex items-center space-x-1 mb-1">
+        <i class="fas fa-home text-[10px]">
+        </i>
+        <a class="underline" href="#">
+          Trang chủ
+        </a>
+        <span>
+          / NEW COLLECTIONS
+        </span>
+      </div>
+      <div class="font-normal text-[11px] text-black">
+        NEW COLLECTION (1232 sản phẩm)
+      </div>
+    </section>
+    <section class="flex flex-col lg:flex-row gap-6">
+      <!-- Left side -->
+      <div class="flex-1 bg-white border border-gray-200 rounded-md p-4">
+        <h2 class="font-extrabold text-base mb-4">
+          THÔNG TIN GIAO HÀNG
+        </h2>
+        <div
+          class="border border-gray-200 rounded-md p-3 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 class="text-[#1B3B5B] font-semibold text-sm mb-1">
+              Địa chỉ nhận hàng
+            </h3>
+            <p class="text-xs font-semibold text-black">
+              Nguyen Van A
+              <span class="font-normal">
+                (+84) 947238197
+              </span>
+              <span class="font-normal">
+                Số 401, Đường Lê Đức Thọ, Phường 17, Quận Gò Vấp, TP. Hồ Chí Minh
+              </span>
+            </p>
+          </div>
+          <div class="text-right mt-3 sm:mt-0">
+            <button class="text-[#C28B1B] font-semibold text-sm mb-1 hover:underline" type="button">
+              Thay đổi
+            </button>
+            <div class="text-[10px] text-red-600 border border-red-600 rounded px-1 inline-block">
+              Mặc định
+            </div>
+          </div>
+        </div>
+        <div class="mb-4">
+          <h3 class="font-semibold text-sm mb-2">
+            Ghi chú đơn hàng
+          </h3>
+          <textarea class="w-full border border-gray-200 rounded-md p-2 text-xs resize-none placeholder:text-gray-400"
+            placeholder="Nhập nội dung" rows="4"></textarea>
+        </div>
+        <div class="mb-4">
+          <h3 class="font-semibold text-sm mb-2">
+            Phương thức vận chuyển
+          </h3>
+          <div class="flex flex-wrap gap-3">
+            <button
+              class="flex justify-between items-center border border-gray-400 rounded-md text-xs font-semibold text-[#1B3B5B] px-3 py-1 w-[140px]"
+              type="button">
+              <span>
+                Nhanh
+              </span>
+              <span class="text-[10px] font-normal">
+                20 phút
+              </span>
+              <i class="fas fa-info-circle text-[10px] text-gray-400 ml-1" title="Thông tin">
+              </i>
+              <span class="ml-auto">
+                20.000 vnd
+              </span>
+            </button>
+            <button
+              class="flex justify-between items-center border border-gray-400 rounded-md text-xs font-semibold text-[#1B3B5B] px-3 py-1 w-[140px]"
+              type="button">
+              <span>
+                Tiêu chuẩn
+              </span>
+              <span class="text-[10px] font-normal">
+                40 phút
+              </span>
+              <i class="fas fa-info-circle text-[10px] text-gray-400 ml-1" title="Thông tin">
+              </i>
+              <span class="ml-auto">
+                11.000 vnd
+              </span>
+            </button>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-semibold text-sm mb-2">
+            Phương thức thanh toán
+          </h3>
+          <div class="flex flex-wrap gap-3">
+            <button
+              class="border border-gray-400 rounded-md text-xs font-semibold text-[#1B3B5B] px-3 py-1 w-[200px] text-left"
+              type="button">
+              Thanh toán tiền mặt
+            </button>
+            <button
+              class="flex items-center gap-2 border border-gray-400 rounded-md text-xs font-semibold text-[#1B3B5B] px-3 py-1 w-[200px]"
+              type="button">
+              <img alt="Logo Ví MoMo màu hồng" class="w-5 h-5" height="20"
+                src="https://storage.googleapis.com/a1aa/image/bc155505-d0db-4976-19be-51589260d3a7.jpg" width="20" />
+              Ví MoMo hoặc chuyển khoản ngân hàng
+            </button>
+          </div>
+          <div class="mt-3">
+            <button
+              class="flex items-center gap-2 border border-gray-400 rounded-md text-xs font-semibold text-[#1B3B5B] px-3 py-1 w-[200px]"
+              type="button">
+              <img alt="Logo VNPay màu đỏ và xanh" class="w-5 h-5" height="20"
+                src="https://storage.googleapis.com/a1aa/image/0a4b2d56-2227-4557-d8ef-e96ee7003c18.jpg" width="20" />
+              Thanh toán quét mã QR
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Right side -->
+      <aside class="w-full lg:w-[360px] flex flex-col gap-6">
+        <div class="bg-[#FAFAFA] border border-gray-200 rounded-md p-4">
+          <h3 class="font-semibold text-sm mb-3">
+            Giỏ Hàng
+            <span class="text-xs font-normal">
+              (3 sản phẩm)
+            </span>
+          </h3>
+          <div class="space-y-3 mb-3">
+            <div class="flex gap-3">
+              <img alt="Dây chuyền bạc, hình ảnh sản phẩm trang sức màu bạc"
+                class="w-[50px] h-[50px] object-contain rounded" height="50"
+                src="https://storage.googleapis.com/a1aa/image/e50e3452-0848-499c-44e7-1ea246d7e4b3.jpg" width="50" />
+              <div class="text-xs text-gray-600">
+                <p class="font-semibold text-[#1B3B5B] mb-0.5">
+                  Dây chuyền bạc
+                </p>
+                <p class="mb-0.5">
+                  Số lượng: 2
+                </p>
+                <p class="font-semibold text-[13px] text-black mb-0">
+                  Thành tiền: 578.000đ
+                </p>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <img alt="Dây chuyền bạc, hình ảnh sản phẩm trang sức màu bạc"
+                class="w-[50px] h-[50px] object-contain rounded" height="50"
+                src="https://storage.googleapis.com/a1aa/image/e50e3452-0848-499c-44e7-1ea246d7e4b3.jpg" width="50" />
+              <div class="text-xs text-gray-600">
+                <p class="font-semibold text-[#1B3B5B] mb-0.5">
+                  Dây chuyền bạc
+                </p>
+                <p class="mb-0.5">
+                  Số lượng: 1
+                </p>
+                <p class="font-semibold text-[13px] text-black mb-0">
+                  Thành tiền: 289.000đ
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-gray-300 pt-2 flex justify-between font-semibold text-[#1B3B5B] text-sm">
+            <span>
+              Tạm tính
+            </span>
+            <span class="text-[#1B3B5B] font-bold">
+              867.000đ
+            </span>
+          </div>
+        </div>
+        <div class="bg-[#FAFAFA] border border-gray-200 rounded-md p-4">
+          <h3 class="font-semibold text-sm mb-3">
+            Mã Giảm Giá
+          </h3>
+          <form class="flex gap-2">
+            <input class="flex-1 border border-[#1B3B5B] rounded-md text-xs px-3 py-2 focus:outline-none"
+              placeholder="Nhập mã giảm giá" type="text" />
+            <button class="bg-[#C28B1B] text-white text-xs font-semibold px-4 rounded-md" type="submit">
+              ÁP DỤNG
+            </button>
+          </form>
+          <div class="mt-4 text-xs text-black">
+            <div class="flex justify-between mb-1">
+              <span>
+                Tạm tính:
+              </span>
+              <span class="font-bold">
+                867.000đ
+              </span>
+            </div>
+            <div class="flex justify-between mb-1">
+              <span>
+                Giảm giá:
+              </span>
+              <span>
+                0đ
+              </span>
+            </div>
+            <div class="flex justify-between mb-3">
+              <span>
+                Phí vận chuyển:
+              </span>
+              <span>
+                20.000đ
+              </span>
+            </div>
+            <div class="flex justify-between font-bold text-red-600 text-lg">
+              <span>
+                Thành tiền:
+              </span>
+              <span>
+                887.000đ
+              </span>
+            </div>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-2">
+            Vui lòng kiểm tra Sản phẩm &amp; Mã giảm giá trước khi thanh toán
+          </p>
+        </div>
+        <button class="bg-[#C28B1B] text-white font-semibold text-sm rounded-md py-3" type="button">
+          Thanh Toán
+        </button>
+      </aside>
+    </section>
+  </main>
+  <footer class="bg-[#4A3F43] text-white py-12">
+    <div class="max-w-[1280px] mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+      <div>
+        <h4 class="mb-6 font-normal text-base">
+          FAYRA STPRE
+        </h4>
+        <p class="mb-4 leading-tight">
+          Lô 3, Tầng 6 Tòa Nhà Genpacific, Đường Số 16, Công Viên Phần Mềm Quang
+          Trung, P. Tân Chánh Hiệp, Quận 12, TP.HCM
+        </p>
+        <p class="mb-4">
+          Email: fayracontact@fayra.com
+        </p>
+        <p>
+          Điện Thoại: (024) 888 888
+        </p>
+      </div>
+      <div>
+        <h4 class="mb-6 font-normal text-base">
+          VỀ CHÚNG TÔI
+        </h4>
+        <ul class="space-y-3">
+          <li>
+            <a class="hover:underline" href="#">
+              Về Chúng Tôi
+            </a>
+          </li>
+          <li>
+            <a class="hover:underline" href="#">
+              Liên Hệ
+            </a>
+          </li>
+          <li>
+            <a class="hover:underline" href="#">
+              Tuyển Dụng
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="mb-6 font-normal text-base">
+          THÔNG TIN
+        </h4>
+        <ul class="space-y-3">
+          <li>
+            <a class="hover:underline" href="#">
+              Mua Trang Sức
+            </a>
+          </li>
+          <li>
+            <a class="hover:underline" href="#">
+              Bài Viết
+            </a>
+          </li>
+          <li>
+            <a class="hover:underline" href="#">
+              Yêu Cầu Hóa Đơn Điện Tử
+            </a>
+          </li>
+          <li>
+            <a class="hover:underline" href="#">
+              Gửi Đóng Góp Ý Kiến
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div
+      class="max-w-[1280px] mx-auto px-6 mt-10 border-t border-gray-600 text-xs text-gray-400 flex flex-col md:flex-row justify-between">
+      <p class="py-4">
+        Copyright 2024 © Fayra Team
+      </p>
+      <p class="py-4">
+        Theo Dõi Chúng Tôi
+      </p>
+    </div>
+  </footer>
+</body>
+
+</html>

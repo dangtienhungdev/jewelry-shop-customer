@@ -1,0 +1,408 @@
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>
+    Shopping Cart
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&amp;display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Open Sans", sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-white text-black">
+  <!-- Header -->
+  <header class="flex items-center justify-between px-6 py-4">
+    <div class="text-lg font-normal">
+      Logo
+    </div>
+    <nav class="hidden md:flex space-x-10 text-sm font-normal text-[#2a4a6e]">
+      <a class="hover:underline" href="#">
+        TRANG CHỦ
+      </a>
+      <a class="hover:underline" href="#">
+        SẢN PHẨM
+      </a>
+      <a class="hover:underline" href="#">
+        THÔNG TIN
+      </a>
+      <a class="hover:underline" href="#">
+        HỆ THỐNG
+      </a>
+    </nav>
+    <div class="flex space-x-4 text-black text-lg">
+      <button aria-label="Cart" class="focus:outline-none">
+        <i class="fas fa-shopping-cart">
+        </i>
+      </button>
+      <button aria-label="User" class="focus:outline-none">
+        <i class="fas fa-user">
+        </i>
+      </button>
+    </div>
+  </header>
+  <!-- Breadcrumb and cart info -->
+  <section class="px-6 text-xs text-gray-700">
+    <div class="flex items-center space-x-1 mb-1">
+      <i class="fas fa-home text-[10px]">
+      </i>
+      <a class="text-[#2a4a6e] hover:underline" href="#">
+        Trang chủ
+      </a>
+      <span>
+        / SHOPPING CART
+      </span>
+    </div>
+    <div>
+      SHOPPING CART (4 sản phẩm )
+    </div>
+  </section>
+  <!-- Table header -->
+  <section class="mt-4">
+    <div
+      class="bg-[#caa85a] text-black text-sm font-normal grid grid-cols-[60px_100px_1fr_90px_110px_90px_60px] items-center px-6 py-3">
+      <div>
+        Chọn
+      </div>
+      <div>
+        Hình ảnh
+      </div>
+      <div>
+        Sản phẩm
+      </div>
+      <div>
+        Giá tiền
+      </div>
+      <div>
+        Số lượng
+      </div>
+      <div>
+        Tổng
+      </div>
+      <div>
+        Xóa
+      </div>
+    </div>
+  </section>
+  <!-- Table rows -->
+  <section class="divide-y divide-gray-200">
+    <!-- Row 1 -->
+    <div class="grid grid-cols-[60px_100px_1fr_90px_110px_90px_60px] items-center px-6 py-4">
+      <input class="w-6 h-6 border-2 border-gray-600 rounded-sm" type="checkbox" />
+      <img alt="Silver ring with green gem on white background" class="w-[80px] h-[60px] object-contain" height="60"
+        src="https://storage.googleapis.com/a1aa/image/b02ea04f-f3f7-40b9-f3a7-4a76e7290d2f.jpg" width="100" />
+      <div class="text-xs leading-tight">
+        <div>
+          R MIDI GREEN
+        </div>
+        <div>
+          Đẹp với những người phụ nữ trung niên
+        </div>
+      </div>
+      <div class="text-sm font-normal">
+        $44.99
+      </div>
+      <div class="flex items-center space-x-2 text-xs font-normal text-gray-400 select-none">
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          +
+        </button>
+        <span class="text-black font-semibold">
+          0
+        </span>
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          −
+        </button>
+      </div>
+      <div class="text-sm font-normal">
+        $44.99
+      </div>
+      <button aria-label="Delete item" class="text-black text-lg">
+        <i class="fas fa-trash-alt">
+        </i>
+      </button>
+    </div>
+    <!-- Row 2 -->
+    <div class="grid grid-cols-[60px_100px_1fr_90px_110px_90px_60px] items-center px-6 py-4">
+      <input class="w-6 h-6 border-2 border-gray-600 rounded-sm" type="checkbox" />
+      <img alt="Silver ring with big 6mm gem on white background" class="w-[80px] h-[60px] object-contain" height="60"
+        src="https://storage.googleapis.com/a1aa/image/cbae6a4e-dc18-4a66-4ffe-11a5e4f314c5.jpg" width="100" />
+      <div class="text-xs leading-tight">
+        <div>
+          R MIDI BIG 6MM GEM
+        </div>
+        <div>
+          Rất đẹp
+        </div>
+      </div>
+      <div class="text-sm font-normal">
+        $44.99
+      </div>
+      <div class="flex items-center space-x-2 text-xs font-normal text-gray-400 select-none">
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          +
+        </button>
+        <span class="text-black font-semibold">
+          0
+        </span>
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          −
+        </button>
+      </div>
+      <div class="text-sm font-normal">
+        $46.99
+      </div>
+      <button aria-label="Delete item" class="text-black text-lg">
+        <i class="fas fa-trash-alt">
+        </i>
+      </button>
+    </div>
+    <!-- Row 3 -->
+    <div class="grid grid-cols-[60px_100px_1fr_90px_110px_90px_60px] items-center px-6 py-4">
+      <input class="w-6 h-6 border-2 border-gray-600 rounded-sm" type="checkbox" />
+      <img alt="Silver ring with big 6mm gem on white background" class="w-[80px] h-[60px] object-contain" height="60"
+        src="https://storage.googleapis.com/a1aa/image/cbae6a4e-dc18-4a66-4ffe-11a5e4f314c5.jpg" width="100" />
+      <div class="text-xs leading-tight">
+        <div>
+          R MIDI BIG 6MM GEM
+        </div>
+        <div>
+          Rất đẹp
+        </div>
+      </div>
+      <div class="text-sm font-normal">
+        $44.999
+      </div>
+      <div class="flex items-center space-x-2 text-xs font-normal text-gray-400 select-none">
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          +
+        </button>
+        <span class="text-black font-semibold">
+          0
+        </span>
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          −
+        </button>
+      </div>
+      <div class="text-sm font-normal">
+        $44.999
+      </div>
+      <button aria-label="Delete item" class="text-black text-lg">
+        <i class="fas fa-trash-alt">
+        </i>
+      </button>
+    </div>
+    <!-- Row 4 -->
+    <div class="grid grid-cols-[60px_100px_1fr_90px_110px_90px_60px] items-center px-6 py-4">
+      <input class="w-6 h-6 border-2 border-gray-600 rounded-sm" type="checkbox" />
+      <img alt="Silver ring with green gem on white background" class="w-[80px] h-[60px] object-contain" height="60"
+        src="https://storage.googleapis.com/a1aa/image/b02ea04f-f3f7-40b9-f3a7-4a76e7290d2f.jpg" width="100" />
+      <div class="text-xs leading-tight">
+        <div>
+          R MIDI GREEN
+        </div>
+        <div>
+          Đẹp với những người phụ nữ trung niên
+        </div>
+      </div>
+      <div class="text-sm font-normal">
+        $44.99
+      </div>
+      <div class="flex items-center space-x-2 text-xs font-normal text-gray-400 select-none">
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          +
+        </button>
+        <span class="text-black font-semibold">
+          0
+        </span>
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          −
+        </button>
+      </div>
+      <div class="text-sm font-normal">
+        $46.99
+      </div>
+      <button aria-label="Delete item" class="text-black text-lg">
+        <i class="fas fa-trash-alt">
+        </i>
+      </button>
+    </div>
+    <!-- Row 5 -->
+    <div class="grid grid-cols-[60px_100px_1fr_90px_110px_90px_60px] items-center px-6 py-4">
+      <input class="w-6 h-6 border-2 border-gray-600 rounded-sm" type="checkbox" />
+      <img alt="Silver ring with green gem on white background" class="w-[80px] h-[60px] object-contain" height="60"
+        src="https://storage.googleapis.com/a1aa/image/b02ea04f-f3f7-40b9-f3a7-4a76e7290d2f.jpg" width="100" />
+      <div class="text-xs leading-tight">
+        <div>
+          R MIDI BIG 6MM GEM
+        </div>
+        <div>
+          Đẹp với những người phụ nữ trung niên
+        </div>
+      </div>
+      <div class="text-sm font-normal">
+        $44.99
+      </div>
+      <div class="flex items-center space-x-2 text-xs font-normal text-gray-400 select-none">
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          +
+        </button>
+        <span class="text-black font-semibold">
+          0
+        </span>
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          −
+        </button>
+      </div>
+      <div class="text-sm font-normal">
+        $44.99
+      </div>
+      <button aria-label="Delete item" class="text-black text-lg">
+        <i class="fas fa-trash-alt">
+        </i>
+      </button>
+    </div>
+    <!-- Row 6 -->
+    <div class="grid grid-cols-[60px_100px_1fr_90px_110px_90px_60px] items-center px-6 py-4">
+      <input class="w-6 h-6 border-2 border-gray-600 rounded-sm" type="checkbox" />
+      <img alt="Silver ring with big 6mm gem on white background" class="w-[80px] h-[60px] object-contain" height="60"
+        src="https://storage.googleapis.com/a1aa/image/cbae6a4e-dc18-4a66-4ffe-11a5e4f314c5.jpg" width="100" />
+      <div class="text-xs leading-tight">
+        <div>
+          R MIDI BIG 6MM GEM
+        </div>
+        <div>
+          Rất đẹp
+        </div>
+      </div>
+      <div class="text-sm font-normal">
+        $44.99
+      </div>
+      <div class="flex items-center space-x-2 text-xs font-normal text-gray-400 select-none">
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          +
+        </button>
+        <span class="text-black font-semibold">
+          0
+        </span>
+        <button class="rounded-full border border-gray-300 w-5 h-5 flex items-center justify-center cursor-not-allowed">
+          −
+        </button>
+      </div>
+      <div class="text-sm font-normal">
+        $46.99
+      </div>
+      <button aria-label="Delete item" class="text-black text-lg">
+        <i class="fas fa-trash-alt">
+        </i>
+      </button>
+    </div>
+  </section>
+  <!-- Footer button -->
+  <section class="flex justify-end px-6 py-4 border-t border-gray-200">
+    <button class="bg-[#c4820a] text-white font-semibold text-xs px-6 py-2 rounded-md" type="button">
+      Mua ngay
+    </button>
+  </section>
+  <!-- Footer -->
+  <footer class="bg-[#3f3333] text-[#d9d2d2] text-xs font-light px-6 py-10">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <h3 class="mb-4 font-normal text-sm">
+          FAYRA STORE
+        </h3>
+        <address class="not-italic text-[11px] leading-tight space-y-2">
+          <p>
+            Lô 3, Tầng 6 Tòa Nhà Genpacific, Đường Số 16, Công Viên Phần Mềm
+            Quang Trung, P. Tân Chánh Hiệp, Quận 12, TP.HCM
+          </p>
+          <p>
+            Email: fayracontact@fayra.com
+          </p>
+          <p>
+            Điện Thoại: (024) 888 888
+          </p>
+        </address>
+      </div>
+      <div>
+        <h3 class="mb-4 font-normal text-sm">
+          VỀ CHÚNG TÔI
+        </h3>
+        <ul class="space-y-2 text-[11px]">
+          <li>
+            <a class="hover:underline" href="#">
+              Về Chúng Tôi
+            </a>
+          </li>
+          <li>
+            <a class="hover:underline" href="#">
+              Liên Hệ
+            </a>
+          </li>
+          <li>
+            <a class="hover:underline" href="#">
+              Tuyển Dụng
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="mb-4 font-normal text-sm">
+          THÔNG TIN
+        </h3>
+        <ul class="space-y-2 text-[11px]">
+          <li>
+            <a class="hover:underline" href="#">
+              Mua Trang Sức
+            </a>
+          </li>
+          <li>
+            <a class="hover:underline" href="#">
+              Bài Viết
+            </a>
+          </li>
+          <li>
+            <a class="hover:underline" href="#">
+              Yêu Cầu Hóa Đơn Điện Tử
+            </a>
+          </li>
+          <li>
+            <a class="hover:underline" href="#">
+              Gửi Đóng Góp Ý Kiến
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-8 border-t border-[#6e5e5e] pt-4 flex flex-col md:flex-row justify-between items-center text-[11px]">
+      <div>
+        Copyright 2024 © Fayra Team
+      </div>
+      <div class="flex items-center space-x-4 mt-3 md:mt-0">
+        <span>
+          Theo Dõi Chúng Tôi
+        </span>
+        <a aria-label="Facebook" class="hover:text-white" href="#">
+          <i class="fab fa-facebook-f">
+          </i>
+        </a>
+        <a aria-label="Instagram" class="hover:text-white" href="#">
+          <i class="fab fa-instagram">
+          </i>
+        </a>
+        <a aria-label="WhatsApp" class="hover:text-white" href="#">
+          <i class="fab fa-whatsapp">
+          </i>
+        </a>
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>

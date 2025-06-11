@@ -9,7 +9,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 	return (
 		<header
-			className={`flex items-center justify-between px-6 py-4 max-w-7xl mx-auto ${className}`}
+			className={`flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full ${className}`}
 		>
 			<div className="text-sm font-normal">
 				<Link to="/" className="hover:text-gray-900 transition-colors">
