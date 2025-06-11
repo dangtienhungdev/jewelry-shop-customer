@@ -1,0 +1,358 @@
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>
+    Jewelry Store
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&amp;display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Montserrat", sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-white text-black">
+  <!-- Header -->
+  <header class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+    <div class="text-lg font-normal">
+      Logo
+    </div>
+    <nav class="hidden md:flex space-x-10 text-sm font-normal text-[#1B3B5B]">
+      <a class="hover:underline" href="#">
+        TRANG CHỦ
+      </a>
+      <a class="hover:underline" href="#">
+        SẢN PHẨM
+      </a>
+      <a class="hover:underline" href="#">
+        THÔNG TIN
+      </a>
+      <a class="hover:underline" href="#">
+        HỆ THỐNG
+      </a>
+    </nav>
+    <div class="flex space-x-4 text-black text-lg">
+      <button aria-label="Cart" class="focus:outline-none">
+        <i class="fas fa-shopping-cart">
+        </i>
+      </button>
+      <button aria-label="User" class="focus:outline-none">
+        <i class="fas fa-user">
+        </i>
+      </button>
+    </div>
+  </header>
+  <!-- Banner Image -->
+  <div class="w-full">
+    <img
+      alt="Jewelry rings arranged on a wooden surface with a wooden geometric vase holding dried flowers on the right"
+      class="w-full object-cover" height="200"
+      src="https://storage.googleapis.com/a1aa/image/a072351c-2c41-41af-586c-ec094a4e826d.jpg" width="1440" />
+  </div>
+  <!-- Breadcrumb and Title -->
+  <section class="max-w-7xl mx-auto px-6 mt-6">
+    <div class="text-xs text-gray-700 mb-1 flex items-center space-x-1">
+      <i class="fas fa-home text-[10px]">
+      </i>
+      <a class="underline font-semibold" href="#">
+        Trang chủ
+      </a>
+      <span>
+        / NEW COLLECTIONS
+      </span>
+    </div>
+    <div class="text-xs text-gray-700 mb-4">
+      NEW COLLECTION (1232 sản phẩm)
+    </div>
+    <div class="flex justify-end mb-6">
+      <select aria-label="Sort products"
+        class="text-xs border border-[#C49A4A] rounded px-2 py-1 text-[#C49A4A] focus:outline-none">
+        <option>
+          Mặc định
+        </option>
+      </select>
+    </div>
+    <div class="flex flex-col md:flex-row md:space-x-8">
+      <!-- Sidebar -->
+      <aside class="flex-shrink-0 w-full md:w-48 mb-10 md:mb-0">
+        <div class="mb-8">
+          <h2 class="font-extrabold text-lg flex items-center space-x-2">
+            <span class="border-l-4 border-[#C49A4A] pl-2">
+              Danh mục
+            </span>
+          </h2>
+          <ul class="mt-2 space-y-1 font-semibold text-base cursor-pointer">
+            <li>
+              Nhẫn
+            </li>
+            <li>
+              Dây chuyền
+            </li>
+            <li>
+              Bông tai
+            </li>
+            <li>
+              Mặt dây chuyền
+            </li>
+            <li>
+              ...
+            </li>
+            <li>
+              ..
+            </li>
+            <li>
+              .....
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="font-extrabold text-lg flex items-center space-x-2">
+            <span class="border-l-4 border-[#C49A4A] pl-2">
+              Lọc giá
+            </span>
+          </h2>
+          <form class="mt-3 space-y-2 font-semibold text-base">
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input class="form-radio text-black" name="price" type="radio" />
+              <span>
+                Dưới 50.000.00₫
+              </span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input class="form-radio text-black" name="price" type="radio" />
+              <span>
+                50.000.00₫ - 100.000₫
+              </span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input class="form-radio text-black" name="price" type="radio" />
+              <span>
+                100.000₫ - 300.000₫
+              </span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input class="form-radio text-black" name="price" type="radio" />
+              <span>
+                300.000₫ - 500.000₫
+              </span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input class="form-radio text-black" name="price" type="radio" />
+              <span>
+                Trên 500.000₫
+              </span>
+            </label>
+          </form>
+        </div>
+      </aside>
+      <!-- Product Grid -->
+      <main class="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <!-- Product 1 -->
+        <article class="border border-[#C49A4A] p-2">
+          <img alt="Silver bracelet with multi rose design on white background" class="w-full object-contain"
+            height="300" src="https://storage.googleapis.com/a1aa/image/681e5adf-fe2f-4e76-d9c2-58a2791a8080.jpg"
+            width="300" />
+          <div class="text-center text-xs mt-2 font-semibold">
+            BRA MULTI ROSE
+          </div>
+          <div class="text-center text-xs mt-1">
+            990.000₫
+          </div>
+        </article>
+        <!-- Product 2 -->
+        <article class="border border-[#C49A4A] p-2">
+          <img alt="Silver bracelet with double chain and labradorite heart stone on white background"
+            class="w-full object-contain" height="300"
+            src="https://storage.googleapis.com/a1aa/image/c6de6379-59f4-429f-8ca3-1dee46a54ea8.jpg" width="300" />
+          <div class="text-center text-xs mt-2 font-semibold">
+            BRA DOUBLE CHAIN BALL LABRADORITE HEART STONE
+          </div>
+          <div class="text-center text-xs mt-1">
+            590.000₫
+          </div>
+        </article>
+        <!-- Product 3 -->
+        <article class="border border-[#C49A4A] p-2">
+          <img alt="Silver bracelet with multi twist bow design on white background" class="w-full object-contain"
+            height="300" src="https://storage.googleapis.com/a1aa/image/bfd5e730-456c-4baa-cc91-ea3e356a09ce.jpg"
+            width="300" />
+          <div class="text-center text-xs mt-2 font-semibold">
+            BRA MULTI TWIST BOW
+          </div>
+          <div class="text-center text-xs mt-1">
+            890.000₫
+          </div>
+        </article>
+        <!-- Product 4 -->
+        <article class="border border-[#C49A4A] p-2">
+          <img alt="Silver ring with butterfly design on white background" class="w-full object-contain" height="300"
+            src="https://storage.googleapis.com/a1aa/image/b5f06c7c-56b8-4294-cedd-bdc4fadbb6a1.jpg" width="300" />
+          <div class="text-center text-xs mt-2 font-semibold">
+            BRA MULTI ROSE
+          </div>
+          <div class="text-center text-xs mt-1">
+            990.000₫
+          </div>
+        </article>
+        <!-- Product 5 -->
+        <article class="border border-[#C49A4A] p-2">
+          <img alt="Silver earrings with double chain and labradorite heart stone on white background"
+            class="w-full object-contain" height="300"
+            src="https://storage.googleapis.com/a1aa/image/e8d3be12-b5f3-44dc-eaf3-04933372ec28.jpg" width="300" />
+          <div class="text-center text-xs mt-2 font-semibold">
+            BRA DOUBLE CHAIN BALL LABRADORITE HEART STONE
+          </div>
+          <div class="text-center text-xs mt-1">
+            590.000₫
+          </div>
+        </article>
+        <!-- Product 6 -->
+        <article class="border border-[#C49A4A] p-2">
+          <img alt="Silver ring with multi twist bow design on white background" class="w-full object-contain"
+            height="300" src="https://storage.googleapis.com/a1aa/image/e4ee5e4e-1ba3-424c-bcea-0eeec9f06fe4.jpg"
+            width="300" />
+          <div class="text-center text-xs mt-2 font-semibold">
+            BRA MULTI TWIST BOW
+          </div>
+          <div class="text-center text-xs mt-1">
+            890.000₫
+          </div>
+        </article>
+        <!-- Product 7 -->
+        <article class="border border-[#C49A4A] p-2">
+          <img alt="Silver bracelet with black flower design on white background" class="w-full object-contain"
+            height="300" src="https://storage.googleapis.com/a1aa/image/7619fbb8-01c9-4d02-e27c-8313582618fd.jpg"
+            width="300" />
+          <div class="text-center text-xs mt-2 font-semibold">
+            BRA MULTI ROSE
+          </div>
+          <div class="text-center text-xs mt-1">
+            990.000₫
+          </div>
+        </article>
+        <!-- Product 8 -->
+        <article class="border border-[#C49A4A] p-2">
+          <img alt="Silver earrings with leaf design on white background" class="w-full object-contain" height="300"
+            src="https://storage.googleapis.com/a1aa/image/202e1a86-96a2-4277-0ed4-bbc01233a063.jpg" width="300" />
+          <div class="text-center text-xs mt-2 font-semibold">
+            BRA DOUBLE CHAIN BALL LABRADORITE HEART STONE
+          </div>
+          <div class="text-center text-xs mt-1">
+            590.000₫
+          </div>
+        </article>
+        <!-- Product 9 -->
+        <article class="border border-[#C49A4A] p-2">
+          <img alt="Silver earrings with pearl and flower design on white background" class="w-full object-contain"
+            height="300" src="https://storage.googleapis.com/a1aa/image/b658d9ec-bb59-4870-db31-3e39e1d820f6.jpg"
+            width="300" />
+          <div class="text-center text-xs mt-2 font-semibold">
+            BRA MULTI TWIST BOW
+          </div>
+          <div class="text-center text-xs mt-1">
+            890.000₫
+          </div>
+        </article>
+      </main>
+    </div>
+    <!-- Pagination -->
+    <div class="flex justify-end space-x-2 mt-8 mb-16 text-xs font-semibold text-[#C49A4A]">
+      <button class="border border-[#C49A4A] px-3 py-1">
+        1
+      </button>
+      <button class="border border-[#C49A4A] px-3 py-1">
+        2
+      </button>
+      <button class="border border-[#C49A4A] px-3 py-1">
+        <i class="fas fa-angle-double-right">
+        </i>
+      </button>
+    </div>
+  </section>
+  <!-- Footer -->
+  <footer class="bg-[#4B3F43] text-white text-sm">
+    <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <h3 class="font-light text-base mb-4">
+          FAYRA STORE
+        </h3>
+        <p class="text-xs font-light leading-relaxed mb-4">
+          Lô 3, Tầng 6 Tòa Nhà Genpacific, Đường Số 16, Công Viên Phần Mềm Quang Trung, P. Tân Chánh Hiệp, Quận 12,
+          TP.HCM
+        </p>
+        <p class="text-xs font-light mb-1">
+          Email: fayracontact@fayra.com
+        </p>
+        <p class="text-xs font-light">
+          Điện Thoại: (024) 888 888
+        </p>
+      </div>
+      <div>
+        <h3 class="font-light text-base mb-4">
+          VỀ CHÚNG TÔI
+        </h3>
+        <ul class="space-y-2 font-light text-xs">
+          <li>
+            Về Chúng Tôi
+          </li>
+          <li>
+            Liên Hệ
+          </li>
+          <li>
+            Tuyển Dụng
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-light text-base mb-4">
+          THÔNG TIN
+        </h3>
+        <ul class="space-y-2 font-light text-xs">
+          <li>
+            Mua Trang Sức
+          </li>
+          <li>
+            Bài Viết
+          </li>
+          <li>
+            Yêu Cầu Hóa Đơn Điện Tử
+          </li>
+          <li>
+            Gửi Đóng Góp Ý Kiến
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div
+      class="border-t border-gray-600 max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between text-xs font-light">
+      <div>
+        Copyright 2024 © Fayra Team
+      </div>
+      <div class="flex items-center space-x-4 mt-2 md:mt-0">
+        <span>
+          Theo Dõi Chúng Tôi
+        </span>
+        <a aria-label="Facebook" class="hover:text-gray-300" href="#">
+          <i class="fab fa-facebook-f">
+          </i>
+        </a>
+        <a aria-label="Instagram" class="hover:text-gray-300" href="#">
+          <i class="fab fa-instagram">
+          </i>
+        </a>
+        <a aria-label="WhatsApp" class="hover:text-gray-300" href="#">
+          <i class="fab fa-whatsapp">
+          </i>
+        </a>
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>

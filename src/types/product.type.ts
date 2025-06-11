@@ -59,3 +59,26 @@ export interface CreateProductPayload {
 export interface UpdateProductPayload extends Partial<CreateProductPayload> {
 	id: string;
 }
+
+export interface ProductFilter {
+	category?: string;
+	priceRange?: {
+		min: number;
+		max: number;
+	};
+	sortBy?: 'default' | 'price_asc' | 'price_desc' | 'newest';
+	page?: number;
+	limit?: number;
+}
+
+export interface ProductListResponse {
+	data: {
+		items: Product[];
+		total: number;
+		page: number;
+		limit: number;
+		totalPages: number;
+	};
+	success: boolean;
+	message?: string;
+}
