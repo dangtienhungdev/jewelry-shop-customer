@@ -16,7 +16,7 @@ export const productApi = {
 
 	// GET /products/:id - Lấy chi tiết sản phẩm
 	getProductById: (id: string) => {
-		return api.get<ApiResponse<Product>>(`/products/${id}`);
+		return api.get<Product>(`/products/${id}`);
 	},
 
 	// POST /products - Tạo sản phẩm mới

@@ -1,5 +1,6 @@
 import type { Product } from '@/types';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
 
 interface ProductListProps {
@@ -15,11 +16,11 @@ const ProductList: React.FC<ProductListProps> = ({
 	isLoading,
 	error,
 }) => {
+	const navigate = useNavigate();
+
 	const handleProductClick = (productId: string) => {
 		// Điều hướng đến trang chi tiết sản phẩm
-		console.log('Clicked product:', productId);
-		// Có thể sử dụng react-router để navigate
-		// navigate(`/products/${productId}`);
+		navigate(`/product-detail/${productId}`);
 	};
 
 	// Loading state

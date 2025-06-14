@@ -1,6 +1,7 @@
 import { useFeaturedProducts } from '@/apis';
 import type { Product } from '@/types/product.type';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const formatPrice = (price: number): string => {
 	return new Intl.NumberFormat('vi-VN', {
@@ -10,6 +11,8 @@ const formatPrice = (price: number): string => {
 };
 
 const ProductShowcase: React.FC = () => {
+	const navigate = useNavigate();
+
 	// Sử dụng hook để lấy sản phẩm nổi bật
 	const {
 		data: featuredProductsResponse,
@@ -21,6 +24,10 @@ const ProductShowcase: React.FC = () => {
 
 	const featuredProducts = featuredProductsResponse?.data?.items || [];
 	console.log('🚀 ~ featuredProducts:', featuredProductsResponse);
+
+	const handleProductClick = (productId: string) => {
+		navigate(`/product-detail/${productId}`);
+	};
 
 	// Loading state
 	if (isLoading) {
@@ -94,10 +101,15 @@ const ProductShowcase: React.FC = () => {
 			</p>
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-7xl mx-auto">
 				{featuredProducts.map((product: Product) => (
-					<div key={product.id} className="text-xs md:text-sm text-gray-900">
+					<div
+						key={product.id}
+						className="text-xs md:text-sm text-gray-900"
+						onClick={() => handleProductClick(product.id)}
+						aria-hidden={true}
+					>
 						<img
 							alt={product.productName}
-							className="rounded-md mb-1 w-full h-48 object-cover"
+							className="rounded-md mb-1 w-full h-48 object-cover cursor-pointer"
 							height={200}
 							src={
 								product.images?.[0] ||

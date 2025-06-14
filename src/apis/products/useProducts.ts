@@ -47,7 +47,7 @@ export const useProduct = (id: string, options?: UseQueryOptions<Product>) => {
 		queryKey: productKeys.detail(id),
 		queryFn: async () => {
 			const response = await productApi.getProductById(id);
-			return response.data.data;
+			return response.data;
 		},
 		enabled: !!id,
 		staleTime: 10 * 60 * 1000, // 10 minutes
