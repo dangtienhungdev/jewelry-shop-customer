@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import React from 'react';
 
-const ProductPagination: React.FC = () => {
-	const [currentPage, setCurrentPage] = useState<number>(1);
-	const totalPages = 5; // Mock data - trong thực tế sẽ tính từ API
+interface ProductPaginationProps {
+	currentPage: number;
+	totalPages?: number;
+	onPageChange: (page: number) => void;
+}
+
+const ProductPagination: React.FC<ProductPaginationProps> = ({
+	currentPage,
+	totalPages = 1,
+	onPageChange,
+}) => {
+	// Không hiển thị pagination nếu chỉ có 1 trang hoặc không có dữ liệu
+	if (totalPages <= 1) {
+		return null;
+	}
 
 	const handlePageChange = (page: number) => {
-		setCurrentPage(page);
-		// Scroll to top khi chuyển trang
-		window.scrollTo({ top: 0, behavior: 'smooth' });
+		if (page !== currentPage && page >= 1 && page <= totalPages) {
+			onPageChange(page);
+		}
 	};
 
 	const handlePrevPage = () => {
@@ -99,7 +112,7 @@ const ProductPagination: React.FC = () => {
 						: 'hover:bg-[#C49A4A] hover:text-white'
 				}`}
 			>
-				<i className="fas fa-angle-double-left"></i>
+				<ChevronLeftIcon className="w-4 h-4" />
 			</button>
 
 			{/* Số trang */}
@@ -115,7 +128,7 @@ const ProductPagination: React.FC = () => {
 						: 'hover:bg-[#C49A4A] hover:text-white'
 				}`}
 			>
-				<i className="fas fa-angle-double-right"></i>
+				<ChevronRightIcon className="w-4 h-4" />
 			</button>
 		</div>
 	);

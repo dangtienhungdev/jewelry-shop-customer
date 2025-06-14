@@ -13,7 +13,7 @@ const ProductBreadcrumb: React.FC = () => {
 			<div className="text-xs text-gray-700 mb-4">
 				NEW COLLECTION (1232 sản phẩm)
 			</div>
-			<div className="flex justify-end mb-6">
+			{/* <div className="flex justify-end mb-6">
 				<select
 					aria-label="Sort products"
 					className="text-xs border border-[#C49A4A] rounded px-2 py-1 text-[#C49A4A] focus:outline-none"
@@ -23,7 +23,7 @@ const ProductBreadcrumb: React.FC = () => {
 					<option>Giá giảm dần</option>
 					<option>Mới nhất</option>
 				</select>
-			</div>
+			</div> */}
 		</section>
 	);
 };

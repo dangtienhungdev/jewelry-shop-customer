@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const ProductFilter: React.FC = () => {
+interface ProductFilterProps {
+	onFilterChange: (filters: any) => void;
+}
+
+const ProductFilter: React.FC<ProductFilterProps> = ({ onFilterChange }) => {
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
 	const [selectedPriceRange, setSelectedPriceRange] = useState<string>('');
 
@@ -22,6 +26,28 @@ const ProductFilter: React.FC = () => {
 		{ label: 'Trên 500.000₫', value: '500000-999999999' },
 	];
 
+	// Gửi filter changes lên parent component khi có thay đổi
+	useEffect(() => {
+		const filters: any = {};
+
+		if (selectedCategory) {
+			filters.category = selectedCategory;
+		}
+
+		if (selectedPriceRange) {
+			const [minPrice, maxPrice] = selectedPriceRange.split('-').map(Number);
+			filters.minPrice = minPrice;
+			filters.maxPrice = maxPrice;
+		}
+
+		onFilterChange(filters);
+	}, [selectedCategory, selectedPriceRange, onFilterChange]);
+
+	const handleCategoryChange = (category: string) => {
+		// Toggle category selection
+		setSelectedCategory(selectedCategory === category ? '' : category);
+	};
+
 	return (
 		<aside className="flex-shrink-0 w-full md:w-48 mb-10 md:mb-0">
 			{/* Danh mục */}
@@ -36,7 +62,7 @@ const ProductFilter: React.FC = () => {
 							className={`cursor-pointer hover:text-[#C49A4A] transition-colors ${
 								selectedCategory === category ? 'text-[#C49A4A]' : ''
 							}`}
-							onClick={() => setSelectedCategory(category)}
+							onClick={() => handleCategoryChange(category)}
 						>
 							{category}
 						</li>

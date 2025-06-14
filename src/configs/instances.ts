@@ -30,14 +30,14 @@ apiInstance.interceptors.request.use(
 		}
 
 		// Log request in development
-		if (import.meta.env.DEV) {
-			console.log('🚀 API Request:', {
-				method: config.method?.toUpperCase(),
-				url: `${config.baseURL}${config.url}`,
-				data: config.data,
-				params: config.params,
-			});
-		}
+		// if (import.meta.env.DEV) {
+		// 	console.log('🚀 API Request:', {
+		// 		method: config.method?.toUpperCase(),
+		// 		url: `${config.baseURL}${config.url}`,
+		// 		data: config.data,
+		// 		params: config.params,
+		// 	});
+		// }
 
 		return config;
 	},
@@ -51,13 +51,13 @@ apiInstance.interceptors.request.use(
 apiInstance.interceptors.response.use(
 	(response: AxiosResponse) => {
 		// Log response in development
-		if (import.meta.env.DEV) {
-			console.log('✅ API Response:', {
-				status: response.status,
-				url: response.config.url,
-				data: response.data,
-			});
-		}
+		// if (import.meta.env.DEV) {
+		// 	console.log('✅ API Response:', {
+		// 		status: response.status,
+		// 		url: response.config.url,
+		// 		data: response.data,
+		// 	});
+		// }
 
 		return response;
 	},
