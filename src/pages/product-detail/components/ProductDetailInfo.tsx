@@ -103,7 +103,7 @@ const ProductDetailInfo: React.FC<ProductDetailInfoProps> = ({ product }) => {
 						<button
 							onClick={() => handleQuantityChange(quantity - 1)}
 							disabled={quantity <= 1}
-							className="w-10 h-10 border flex items-center justify-center border-gray-300 rounded-md hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+							className="w-10 h-10 border cursor-pointer flex items-center justify-center border-gray-300 rounded-md hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							<Minus className="w-4 h-4" />
 						</button>
@@ -113,7 +113,7 @@ const ProductDetailInfo: React.FC<ProductDetailInfoProps> = ({ product }) => {
 						<button
 							onClick={() => handleQuantityChange(quantity + 1)}
 							disabled={quantity >= product.stockQuantity}
-							className="w-10 h-10 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+							className="w-10 h-10 border cursor-pointer border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							<Plus className="w-4 h-4" />
 						</button>

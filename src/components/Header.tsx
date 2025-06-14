@@ -1,12 +1,19 @@
 import { Menu, ShoppingCart, User } from 'lucide-react';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
 	className?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({ className = '' }) => {
+	const navigate = useNavigate();
+
+	// navigate page cart
+	const handleCartClick = () => {
+		navigate('/cart');
+	};
+
 	return (
 		<header
 			className={`flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full ${className}`}
@@ -34,13 +41,14 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 
 			<div className="flex space-x-6 text-gray-900 text-lg">
 				<button
-					className="hover:text-gray-600 transition-colors"
+					className="hover:text-gray-600 transition-colors cursor-pointer"
 					aria-label="Giỏ hàng"
+					onClick={handleCartClick}
 				>
 					<ShoppingCart size={20} />
 				</button>
 				<button
-					className="hover:text-gray-600 transition-colors"
+					className="hover:text-gray-600 transition-colors cursor-pointer"
 					aria-label="Tài khoản"
 				>
 					<User size={20} />
