@@ -16,12 +16,34 @@ const ProductPage: React.FC = () => {
 	const navigate = useNavigate();
 	const [params] = useSearchParams();
 	const searchParamsObject = Object.fromEntries([...params]);
-	console.log('🚀 ~ searchParamsObject:', searchParamsObject);
 
 	const { data, error, isLoading } = useProducts({ ...searchParamsObject });
 
 	const handleFilterChange = (newFilters: any) => {
 		console.log('🚀 ~ newFilters:', newFilters);
+
+		// Tạo params mới với filters
+		const newParams = new URLSearchParams();
+
+		// Giữ lại page = 1 khi filter thay đổi
+		newParams.set('page', '1');
+		newParams.set('limit', searchParamsObject.limit || '9');
+
+		// Thêm filters vào params
+		Object.entries(newFilters).forEach(([key, value]) => {
+			if (value !== undefined && value !== null && value !== '') {
+				newParams.set(key, value.toString());
+			}
+		});
+
+		// Navigate với params mới
+		navigate(
+			{
+				pathname: '/products',
+				search: newParams.toString(),
+			},
+			{ replace: true }
+		);
 	};
 
 	const handlePageChange = (page: number, limit: number = 9) => {

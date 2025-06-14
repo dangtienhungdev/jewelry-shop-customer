@@ -1,22 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import { useCategories } from '@/apis';
+import React, { useState } from 'react';
+import {
+	createSearchParams,
+	useNavigate,
+	useSearchParams,
+} from 'react-router-dom';
 
 interface ProductFilterProps {
 	onFilterChange: (filters: any) => void;
 }
 
 const ProductFilter: React.FC<ProductFilterProps> = ({ onFilterChange }) => {
-	const [selectedCategory, setSelectedCategory] = useState<string>('');
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
+	const searchParamsObject = Object.fromEntries([...searchParams]);
+
+	const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
 	const [selectedPriceRange, setSelectedPriceRange] = useState<string>('');
 
-	const categories = [
-		'Nhẫn',
-		'Dây chuyền',
-		'Bông tai',
-		'Mặt dây chuyền',
-		'Lắc tay',
-		'Vòng cổ',
-		'Khuyên tai',
-	];
+	// Lấy categories từ API
+	const { data, isLoading: loadingCategories } = useCategories();
+	const categories = data?.data?.items || [];
 
 	const priceRanges = [
 		{ label: 'Dưới 50.000₫', value: '0-50000' },
@@ -26,26 +30,21 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ onFilterChange }) => {
 		{ label: 'Trên 500.000₫', value: '500000-999999999' },
 	];
 
-	// Gửi filter changes lên parent component khi có thay đổi
-	useEffect(() => {
-		const filters: any = {};
-
-		if (selectedCategory) {
-			filters.category = selectedCategory;
-		}
-
-		if (selectedPriceRange) {
-			const [minPrice, maxPrice] = selectedPriceRange.split('-').map(Number);
-			filters.minPrice = minPrice;
-			filters.maxPrice = maxPrice;
-		}
-
-		onFilterChange(filters);
-	}, [selectedCategory, selectedPriceRange, onFilterChange]);
-
-	const handleCategoryChange = (category: string) => {
+	const handleCategoryChange = (categoryId: string) => {
 		// Toggle category selection
-		setSelectedCategory(selectedCategory === category ? '' : category);
+		setSelectedCategoryId(selectedCategoryId === categoryId ? '' : categoryId);
+
+		navigate({
+			pathname: '/products',
+			search: createSearchParams({
+				...searchParamsObject,
+				categoryId: categoryId,
+			}).toString(),
+		});
+	};
+
+	const handlePriceRangeChange = (value: string) => {
+		setSelectedPriceRange(selectedPriceRange === value ? '' : value);
 	};
 
 	return (
@@ -55,19 +54,39 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ onFilterChange }) => {
 				<h2 className="font-extrabold text-lg flex items-center space-x-2">
 					<span className="border-l-4 border-[#C49A4A] pl-2">Danh mục</span>
 				</h2>
-				<ul className="mt-2 space-y-1 font-semibold text-base">
-					{categories.map((category, index) => (
-						<li
-							key={index}
-							className={`cursor-pointer hover:text-[#C49A4A] transition-colors ${
-								selectedCategory === category ? 'text-[#C49A4A]' : ''
-							}`}
-							onClick={() => handleCategoryChange(category)}
-						>
-							{category}
-						</li>
-					))}
-				</ul>
+
+				{loadingCategories ? (
+					<div className="mt-2">
+						{/* Loading skeleton */}
+						{Array.from({ length: 5 }).map((_, index) => (
+							<div
+								key={index}
+								className="h-6 bg-gray-200 animate-pulse rounded mb-2"
+							></div>
+						))}
+					</div>
+				) : categories.length > 0 ? (
+					<ul className="mt-2 space-y-1 font-semibold text-base">
+						{categories &&
+							categories.length > 0 &&
+							categories.map((category) => (
+								<li
+									key={category.id}
+									className={`cursor-pointer hover:text-[#C49A4A] transition-colors ${
+										selectedCategoryId === category.id ? 'text-[#C49A4A]' : ''
+									}`}
+									onClick={() => handleCategoryChange(category.id)}
+									aria-hidden={true}
+								>
+									{category.categoryName}
+								</li>
+							))}
+					</ul>
+				) : (
+					<div className="mt-2 text-gray-500 text-sm">
+						Không có danh mục nào
+					</div>
+				)}
 			</div>
 
 			{/* Lọc giá */}
@@ -87,7 +106,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ onFilterChange }) => {
 								type="radio"
 								value={priceRange.value}
 								checked={selectedPriceRange === priceRange.value}
-								onChange={(e) => setSelectedPriceRange(e.target.value)}
+								onChange={() => handlePriceRangeChange(priceRange.value)}
 							/>
 							<span>{priceRange.label}</span>
 						</label>
