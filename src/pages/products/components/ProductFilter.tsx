@@ -1,5 +1,5 @@
 import { useCategories } from '@/apis';
-import React, { useState } from 'react';
+import React from 'react';
 import {
 	createSearchParams,
 	useNavigate,
@@ -15,9 +15,6 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ onFilterChange }) => {
 	const [searchParams] = useSearchParams();
 	const searchParamsObject = Object.fromEntries([...searchParams]);
 
-	const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
-	const [selectedPriceRange, setSelectedPriceRange] = useState<string>('');
-
 	// Lấy categories từ API
 	const { data, isLoading: loadingCategories } = useCategories();
 	const categories = data?.data?.items || [];
@@ -30,25 +27,106 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ onFilterChange }) => {
 		{ label: 'Trên 500.000₫', value: '500000-999999999' },
 	];
 
+	// Check if category is selected from URL
+	const isCategorySelected = (categoryId: string) => {
+		return searchParamsObject.categoryId === categoryId;
+	};
+
+	// Check if price range is selected from URL
+	const isPriceRangeSelected = (priceRangeValue: string) => {
+		const [minPrice, maxPrice] = priceRangeValue.split('-');
+		return (
+			searchParamsObject.minPrice === minPrice &&
+			searchParamsObject.maxPrice === maxPrice
+		);
+	};
+
+	// Check if any filter is applied
+	const hasActiveFilters = () => {
+		return !!(
+			searchParamsObject.categoryId ||
+			(searchParamsObject.minPrice && searchParamsObject.maxPrice)
+		);
+	};
+
 	const handleCategoryChange = (categoryId: string) => {
 		// Toggle category selection
-		setSelectedCategoryId(selectedCategoryId === categoryId ? '' : categoryId);
+		const isCurrentlySelected = isCategorySelected(categoryId);
+
+		// Tạo params mới
+		const newParams = { ...searchParamsObject };
+
+		if (isCurrentlySelected) {
+			// Nếu đang được chọn thì bỏ chọn
+			delete newParams.categoryId;
+		} else {
+			// Nếu chưa được chọn thì chọn
+			newParams.categoryId = categoryId;
+		}
+
+		// Reset về trang 1 khi filter thay đổi
+		newParams.page = '1';
 
 		navigate({
 			pathname: '/products',
-			search: createSearchParams({
-				...searchParamsObject,
-				categoryId: categoryId,
-			}).toString(),
+			search: createSearchParams(newParams).toString(),
 		});
 	};
 
-	const handlePriceRangeChange = (value: string) => {
-		setSelectedPriceRange(selectedPriceRange === value ? '' : value);
+	const handlePriceRangeChange = (priceRangeValue: string) => {
+		const isCurrentlySelected = isPriceRangeSelected(priceRangeValue);
+
+		// Tạo params mới
+		const newParams = { ...searchParamsObject };
+
+		if (isCurrentlySelected) {
+			// Nếu đang được chọn thì bỏ chọn
+			delete newParams.minPrice;
+			delete newParams.maxPrice;
+		} else {
+			// Nếu chưa được chọn thì chọn
+			const [minPrice, maxPrice] = priceRangeValue.split('-');
+			newParams.minPrice = minPrice;
+			newParams.maxPrice = maxPrice;
+		}
+
+		// Reset về trang 1 khi filter thay đổi
+		newParams.page = '1';
+
+		navigate({
+			pathname: '/products',
+			search: createSearchParams(newParams).toString(),
+		});
+	};
+
+	const handleClearFilters = () => {
+		// Chỉ giữ lại page và limit, xóa tất cả filters
+		const newParams = {
+			page: '1',
+			limit: searchParamsObject.limit || '9',
+		};
+
+		navigate({
+			pathname: '/products',
+			search: createSearchParams(newParams).toString(),
+		});
 	};
 
 	return (
 		<aside className="flex-shrink-0 w-full md:w-48 mb-10 md:mb-0">
+			{/* Header với nút Clear Filter */}
+			<div className="flex items-center justify-between mb-6">
+				<h1 className="font-extrabold text-xl">Bộ lọc</h1>
+				{hasActiveFilters() && (
+					<button
+						onClick={handleClearFilters}
+						className="text-sm text-red-600 hover:text-red-800 font-medium underline transition-colors"
+					>
+						Xóa bộ lọc
+					</button>
+				)}
+			</div>
+
 			{/* Danh mục */}
 			<div className="mb-8">
 				<h2 className="font-extrabold text-lg flex items-center space-x-2">
@@ -73,7 +151,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ onFilterChange }) => {
 								<li
 									key={category.id}
 									className={`cursor-pointer hover:text-[#C49A4A] transition-colors ${
-										selectedCategoryId === category.id ? 'text-[#C49A4A]' : ''
+										isCategorySelected(category.id) ? 'text-[#C49A4A]' : ''
 									}`}
 									onClick={() => handleCategoryChange(category.id)}
 									aria-hidden={true}
@@ -94,7 +172,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ onFilterChange }) => {
 				<h2 className="font-extrabold text-lg flex items-center space-x-2">
 					<span className="border-l-4 border-[#C49A4A] pl-2">Lọc giá</span>
 				</h2>
-				<form className="mt-3 space-y-2 font-semibold text-base">
+				<div className="mt-3 space-y-2 font-semibold text-base">
 					{priceRanges.map((priceRange, index) => (
 						<label
 							key={index}
@@ -105,13 +183,19 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ onFilterChange }) => {
 								name="price"
 								type="radio"
 								value={priceRange.value}
-								checked={selectedPriceRange === priceRange.value}
+								checked={isPriceRangeSelected(priceRange.value)}
 								onChange={() => handlePriceRangeChange(priceRange.value)}
 							/>
-							<span>{priceRange.label}</span>
+							<span
+								className={
+									isPriceRangeSelected(priceRange.value) ? 'text-[#C49A4A]' : ''
+								}
+							>
+								{priceRange.label}
+							</span>
 						</label>
 					))}
-				</form>
+				</div>
 			</div>
 		</aside>
 	);
