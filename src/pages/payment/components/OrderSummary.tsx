@@ -1,33 +1,28 @@
-import type { OrderItem } from '@/types/payment.type';
+import type { CheckoutData } from '@/contexts/CheckoutContext';
+import type { CartItem } from '@/types/cart.type';
 import React, { useState } from 'react';
 
-const OrderSummary: React.FC = () => {
+interface OrderSummaryProps {
+	checkoutData: CheckoutData;
+	onPayment?: (paymentData: {
+		items: CartItem[];
+		subtotal: number;
+		discount: number;
+		shippingFee: number;
+		total: number;
+		discountCode?: string;
+	}) => void;
+}
+
+const OrderSummary: React.FC<OrderSummaryProps> = ({
+	checkoutData,
+	onPayment,
+}) => {
 	const [discountCode, setDiscountCode] = useState('');
 	const [appliedDiscount, setAppliedDiscount] = useState(0);
 
-	// Mock data
-	const orderItems: OrderItem[] = [
-		{
-			id: '1',
-			name: 'Dây chuyền bạc',
-			image:
-				'https://storage.googleapis.com/a1aa/image/e50e3452-0848-499c-44e7-1ea246d7e4b3.jpg',
-			quantity: 2,
-			price: 289000,
-			totalPrice: 578000,
-		},
-		{
-			id: '2',
-			name: 'Dây chuyền bạc',
-			image:
-				'https://storage.googleapis.com/a1aa/image/e50e3452-0848-499c-44e7-1ea246d7e4b3.jpg',
-			quantity: 1,
-			price: 289000,
-			totalPrice: 289000,
-		},
-	];
-
-	const subtotal = orderItems.reduce((sum, item) => sum + item.totalPrice, 0);
+	const { selectedItems, totalAmount } = checkoutData;
+	const subtotal = totalAmount;
 	const shippingFee = 20000;
 	const total = subtotal - appliedDiscount + shippingFee;
 
@@ -50,15 +45,22 @@ const OrderSummary: React.FC = () => {
 	};
 
 	const handlePayment = () => {
-		// Logic thanh toán
-		console.log('Processing payment...', {
-			items: orderItems,
+		const paymentData = {
+			items: selectedItems,
 			subtotal,
 			discount: appliedDiscount,
 			shippingFee,
 			total,
-		});
-		alert(`Thanh toán thành công!\nTổng tiền: ${formatPrice(total)}`);
+			discountCode: appliedDiscount > 0 ? discountCode : undefined,
+		};
+
+		if (onPayment) {
+			onPayment(paymentData);
+		} else {
+			// Fallback behavior
+			console.log('Processing payment...', paymentData);
+			alert(`Thanh toán thành công!\nTổng tiền: ${formatPrice(total)}`);
+		}
 	};
 
 	return (
@@ -68,16 +70,19 @@ const OrderSummary: React.FC = () => {
 				<h3 className="font-semibold text-sm mb-3">
 					Giỏ Hàng
 					<span className="text-xs font-normal ml-1">
-						({orderItems.length} sản phẩm)
+						({selectedItems.length} sản phẩm)
 					</span>
 				</h3>
 				<div className="space-y-3 mb-3">
-					{orderItems.map((item) => (
-						<div key={item.id} className="flex gap-3">
+					{selectedItems.map((item: CartItem) => (
+						<div key={item.product.id} className="flex gap-3">
 							<img
-								alt={item.name}
+								alt={item.product.productName}
 								className="w-[50px] h-[50px] object-contain rounded"
-								src={item.image}
+								src={
+									item.product.images[0] ||
+									'https://via.placeholder.com/50x50?text=No+Image'
+								}
 								onError={(e) => {
 									const target = e.target as HTMLImageElement;
 									target.src =
@@ -86,11 +91,14 @@ const OrderSummary: React.FC = () => {
 							/>
 							<div className="text-xs text-gray-600">
 								<p className="font-semibold text-[#1B3B5B] mb-0.5">
-									{item.name}
+									{item.product.productName}
 								</p>
 								<p className="mb-0.5">Số lượng: {item.quantity}</p>
+								<p className="text-[10px] text-gray-500 mb-0.5">
+									Đơn giá: {formatPrice(item.effectivePrice)}
+								</p>
 								<p className="font-semibold text-[13px] text-black mb-0">
-									Thành tiền: {formatPrice(item.totalPrice)}
+									Thành tiền: {formatPrice(item.subtotal)}
 								</p>
 							</div>
 						</div>

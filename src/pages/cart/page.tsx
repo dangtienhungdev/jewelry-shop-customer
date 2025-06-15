@@ -1,7 +1,9 @@
 import { useCart } from '@/apis/cart';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCheckout } from '@/contexts/CheckoutContext';
 import { MainLayout } from '@/layouts';
-import React from 'react';
+import type { CartItem } from '@/types/cart.type';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CartBreadcrumb from './components/CartBreadcrumb';
 import CartSummary from './components/CartSummary';
@@ -10,12 +12,48 @@ import CartTable from './components/CartTable';
 const CartPage: React.FC = () => {
 	const navigate = useNavigate();
 	const { isAuthenticated } = useAuth();
+	const { setCheckoutData } = useCheckout();
 
 	// Hook để lấy giỏ hàng
 	const { data: cart, isLoading, error } = useCart();
 
+	// State để quản lý selected items
+	const [selectedItems, setSelectedItems] = useState<string[]>([]);
+	const [selectedCartItems, setSelectedCartItems] = useState<CartItem[]>([]);
+
+	// Handle selected items change from CartTable - wrap với useCallback
+	const handleSelectedItemsChange = useCallback(
+		(selectedIds: string[], selectedItems: CartItem[]) => {
+			setSelectedItems(selectedIds);
+			setSelectedCartItems(selectedItems);
+		},
+		[]
+	);
+
 	const handleCheckout = () => {
-		// Logic thanh toán - chuyển đến trang checkout/payment
+		if (!cart || selectedCartItems.length === 0) {
+			return;
+		}
+
+		// Tính tổng tiền của các items đã chọn
+		const totalAmount = selectedCartItems.reduce(
+			(sum, item) => sum + item.subtotal,
+			0
+		);
+		const totalItems = selectedCartItems.reduce(
+			(sum, item) => sum + item.quantity,
+			0
+		);
+
+		// Lưu checkout data vào context
+		setCheckoutData({
+			cart,
+			selectedItems: selectedCartItems,
+			totalAmount,
+			totalItems,
+		});
+
+		// Navigate đến payment page
 		navigate('/payment');
 	};
 
@@ -115,13 +153,26 @@ const CartPage: React.FC = () => {
 		);
 	}
 
+	// Tính tổng tiền của các items đã chọn
+	const selectedTotalAmount = selectedCartItems.reduce(
+		(sum, item) => sum + item.subtotal,
+		0
+	);
+	const selectedTotalItems = selectedCartItems.reduce(
+		(sum, item) => sum + item.quantity,
+		0
+	);
+
 	return (
 		<MainLayout>
 			<CartBreadcrumb itemCount={cart.totalItems} />
-			<CartTable cart={cart} />
+			<CartTable
+				cart={cart}
+				onSelectedItemsChange={handleSelectedItemsChange}
+			/>
 			<CartSummary
-				selectedItems={cart.totalItems}
-				totalAmount={cart.totalAmount}
+				selectedItems={selectedTotalItems}
+				totalAmount={selectedTotalAmount}
 				onCheckout={handleCheckout}
 			/>
 		</MainLayout>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'sonner';
 
 interface CartSummaryProps {
 	selectedItems?: number;
@@ -7,8 +8,8 @@ interface CartSummaryProps {
 }
 
 const CartSummary: React.FC<CartSummaryProps> = ({
-	selectedItems = 2,
-	totalAmount = 3898000,
+	selectedItems = 0,
+	totalAmount = 0,
 	onCheckout,
 }) => {
 	const formatPrice = (price: number): string => {
@@ -20,23 +21,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
 	const handleCheckout = () => {
 		if (selectedItems === 0) {
-			alert('Vui lòng chọn ít nhất một sản phẩm để thanh toán');
+			toast.error('Vui lòng chọn ít nhất một sản phẩm để thanh toán');
 			return;
 		}
 
 		if (onCheckout) {
 			onCheckout();
-		} else {
-			// Default behavior - có thể chuyển đến trang thanh toán
-			console.log('Proceed to checkout with:', {
-				selectedItems,
-				totalAmount,
-			});
-			alert(
-				`Thanh toán ${selectedItems} sản phẩm với tổng tiền: ${formatPrice(
-					totalAmount
-				)}`
-			);
 		}
 	};
 
@@ -86,6 +76,16 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 						<i className="fas fa-info-circle text-blue-500 mr-2"></i>
 						Bạn đang thanh toán cho {selectedItems} sản phẩm đã chọn. Những sản
 						phẩm chưa chọn sẽ được lưu trong giỏ hàng.
+					</div>
+				</div>
+			)}
+
+			{/* Warning when no items selected */}
+			{selectedItems === 0 && (
+				<div className="px-6 pb-4">
+					<div className="text-xs text-gray-500 bg-yellow-50 border border-yellow-200 rounded-md p-3">
+						<i className="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+						Vui lòng chọn ít nhất một sản phẩm để tiến hành thanh toán.
 					</div>
 				</div>
 			)}

@@ -1,13 +1,20 @@
 import { useRemoveFromCart, useUpdateCartItem } from '@/apis/cart';
-import type { Cart } from '@/types/cart.type';
-import React, { useState } from 'react';
+import type { Cart, CartItem as CartItemType } from '@/types/cart.type';
+import React, { useEffect, useState } from 'react';
 import CartItem from './CartItem';
 
 interface CartTableProps {
 	cart: Cart;
+	onSelectedItemsChange?: (
+		selectedItems: string[],
+		selectedCartItems: CartItemType[]
+	) => void;
 }
 
-const CartTable: React.FC<CartTableProps> = ({ cart }) => {
+const CartTable: React.FC<CartTableProps> = ({
+	cart,
+	onSelectedItemsChange,
+}) => {
 	const [selectedItems, setSelectedItems] = useState<string[]>(
 		cart.items.map((item) => item.product.id)
 	);
@@ -15,6 +22,14 @@ const CartTable: React.FC<CartTableProps> = ({ cart }) => {
 	// Hooks để cập nhật và xóa sản phẩm
 	const updateCartItemMutation = useUpdateCartItem();
 	const removeFromCartMutation = useRemoveFromCart();
+
+	// Notify parent component when selected items change
+	useEffect(() => {
+		const selectedCartItems = cart.items.filter((item) =>
+			selectedItems.includes(item.product.id)
+		);
+		onSelectedItemsChange?.(selectedItems, selectedCartItems);
+	}, [selectedItems, cart.items, onSelectedItemsChange]);
 
 	const handleToggleSelect = (productId: string) => {
 		setSelectedItems((prev) =>
