@@ -52,6 +52,10 @@ const LoginPage = () => {
 		navigate('/register');
 	};
 
+	const goToForgotPassword = () => {
+		navigate('/forgot-password');
+	};
+
 	return (
 		<MainLayout>
 			<div className="max-w-3xl mx-auto px-6 py-20">
@@ -121,12 +125,14 @@ const LoginPage = () => {
 								/>
 								<span>Remember Password?</span>
 							</label>
-							<a
-								href="#"
+							<button
+								type="button"
+								onClick={goToForgotPassword}
 								className="font-bold text-[9px] text-[#4a3c3c] hover:underline"
+								disabled={loginMutation.isPending}
 							>
 								Forgot Password?
-							</a>
+							</button>
 						</div>
 
 						{/* Submit Button */}

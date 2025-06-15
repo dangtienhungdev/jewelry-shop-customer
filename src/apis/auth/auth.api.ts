@@ -60,14 +60,14 @@ export const authApi = {
 		);
 	},
 
-	// POST /auth/forgot-password - Quên mật khẩu
+	// POST /customers/forgot-password - Quên mật khẩu
 	forgotPassword: (data: ForgotPasswordPayload) => {
-		return api.post<ApiResponse<null>>('/auth/forgot-password', data);
+		return api.post<ApiResponse<null>>('/customers/forgot-password', data);
 	},
 
-	// POST /auth/reset-password - Reset mật khẩu
+	// POST /customers/reset-password - Reset mật khẩu
 	resetPassword: (data: ResetPasswordPayload) => {
-		return api.post<ApiResponse<null>>('/auth/reset-password', data);
+		return api.post<ApiResponse<null>>('/customers/reset-password', data);
 	},
 
 	// POST /auth/verify-email - Xác thực email
