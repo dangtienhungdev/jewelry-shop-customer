@@ -23,7 +23,6 @@ const ProductShowcase: React.FC = () => {
 	});
 
 	const featuredProducts = featuredProductsResponse?.data?.items || [];
-	console.log('🚀 ~ featuredProducts:', featuredProductsResponse);
 
 	const handleProductClick = (productId: string) => {
 		navigate(`/product-detail/${productId}`);

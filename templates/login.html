@@ -1,0 +1,145 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900">
+  <!-- Header -->
+  <header class="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+    <div class="text-lg font-normal">Logo</div>
+    <nav class="flex space-x-16 text-sm font-normal text-[#1a3a5a]">
+      <a href="#" class="hover:underline">TRANG CHỦ</a>
+      <a href="#" class="hover:underline">SẢN PHẨM</a>
+      <a href="#" class="hover:underline">THÔNG TIN</a>
+      <a href="#" class="hover:underline">HỆ THỐNG</a>
+    </nav>
+    <div class="flex space-x-6 text-black text-lg">
+      <button aria-label="Cart" class="focus:outline-none">
+        <i class="fas fa-shopping-cart"></i>
+      </button>
+      <button aria-label="User" class="focus:outline-none">
+        <i class="fas fa-user"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="max-w-3xl mx-auto px-6 mt-20">
+    <h2 class="text-center font-semibold text-xl mb-12">Đăng Nhập</h2>
+
+    <form class="space-y-8">
+      <!-- Email input -->
+      <div class="flex items-center bg-white shadow-md rounded-md border border-transparent focus-within:border-gray-300">
+        <div class="pl-6 pr-4 py-4 border-l-4 border-[#4a3c3c] flex items-center justify-center">
+          <i class="far fa-envelope text-[#4a3c3c] text-lg"></i>
+        </div>
+        <input
+          type="email"
+          placeholder="Enter Your email address here"
+          class="flex-1 py-5 px-6 text-xs text-gray-400 placeholder-gray-400 focus:outline-none rounded-r-md"
+          required
+        />
+      </div>
+
+      <!-- Password input -->
+      <div class="flex items-center bg-white shadow-md rounded-md border border-transparent focus-within:border-gray-300">
+        <div class="pl-6 pr-4 py-4 border-l-4 border-[#4a3c3c] flex items-center justify-center">
+          <i class="fas fa-key text-[#4a3c3c] text-lg"></i>
+        </div>
+        <input
+          type="password"
+          placeholder="Enter Your password here"
+          class="flex-1 py-5 px-6 text-xs text-gray-400 placeholder-gray-400 focus:outline-none rounded-r-md"
+          required
+        />
+      </div>
+
+      <!-- Remember and forgot -->
+      <div class="flex justify-between items-center text-[9px] font-normal text-[#4a3c3c]">
+        <label class="flex items-center space-x-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            class="w-5 h-5 bg-[#4a3c3c] border-none text-white checked:bg-[#4a3c3c] focus:ring-0"
+            checked
+          />
+          <span>Remember Password?</span>
+        </label>
+        <a href="#" class="font-bold text-[9px] text-[#4a3c3c] hover:underline">Forgot Password?</a>
+      </div>
+
+      <!-- Submit button -->
+      <div class="flex justify-center">
+        <button
+          type="submit"
+          class="bg-[#b77900] text-white font-semibold text-xs px-12 py-3 rounded shadow-md hover:brightness-110 transition"
+        >
+          Đăng Nhập
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[#4a3c3c] mt-40 text-white">
+    <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-3 gap-12">
+      <div>
+        <h3 class="text-lg font-normal mb-6">FAYRA STORE</h3>
+        <p class="text-sm font-normal leading-relaxed mb-3">
+          Lô 3, Tầng 6 Tòa Nhà Genpacific, Đường<br />
+          Số 16, Công Viên Phần Mềm Quang Trung,<br />
+          P. Tân Chánh Hiệp, Quận 12, TP.HCM
+        </p>
+        <p class="text-sm font-normal mb-3">Email: fayracontact@fayra.com</p>
+        <p class="text-sm font-normal">Điện Thoại: (024) 888 888</p>
+      </div>
+      <div>
+        <h3 class="text-lg font-normal mb-6">VỀ CHÚNG TÔI</h3>
+        <ul class="text-sm font-normal space-y-3">
+          <li><a href="#" class="hover:underline">Về Chúng Tôi</a></li>
+          <li><a href="#" class="hover:underline">Liên Hệ</a></li>
+          <li><a href="#" class="hover:underline">Tuyển Dụng</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-normal mb-6">THÔNG TIN</h3>
+        <ul class="text-sm font-normal space-y-3">
+          <li><a href="#" class="hover:underline">Mua Trang Sức</a></li>
+          <li><a href="#" class="hover:underline">Bài Viết</a></li>
+          <li><a href="#" class="hover:underline">Yêu Cầu Hóa Đơn Điện Tử</a></li>
+          <li><a href="#" class="hover:underline">Gửi Đóng Góp Ý Kiến</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white border-opacity-20 max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center text-sm font-normal">
+      <div>Copyright 2024 © Fayra Team</div>
+      <div class="flex items-center space-x-4 mt-3 sm:mt-0">
+        <span>Theo Dõi Chúng Tôi</span>
+        <a href="#" aria-label="Facebook" class="hover:text-gray-300">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="#" aria-label="Instagram" class="hover:text-gray-300">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="#" aria-label="WhatsApp" class="hover:text-gray-300">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
