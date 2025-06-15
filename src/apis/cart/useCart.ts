@@ -78,7 +78,11 @@ export const useUpdateCartItem = (
 	return useMutation({
 		mutationFn: async (data: UpdateCartItemPayload) => {
 			if (!user?._id) throw new Error('User not found');
-			const response = await cartApi.updateCartItem(user._id, data);
+			const response = await cartApi.updateCartItem(
+				user._id,
+				data.productId,
+				data.quantity
+			);
 			return response.data;
 		},
 		onSuccess: (data) => {
@@ -110,7 +114,7 @@ export const useRemoveFromCart = (
 	return useMutation({
 		mutationFn: async (data: RemoveFromCartPayload) => {
 			if (!user?._id) throw new Error('User not found');
-			const response = await cartApi.removeFromCart(user._id, data);
+			const response = await cartApi.removeFromCart(user._id, data.productId);
 			return response.data;
 		},
 		onSuccess: (data) => {

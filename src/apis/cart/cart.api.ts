@@ -1,10 +1,5 @@
 import { api } from '@/configs';
-import type {
-	AddToCartPayload,
-	Cart,
-	RemoveFromCartPayload,
-	UpdateCartItemPayload,
-} from '@/types/cart.type';
+import type { AddToCartPayload, Cart } from '@/types/cart.type';
 
 // Cart API endpoints
 export const cartApi = {
@@ -18,16 +13,16 @@ export const cartApi = {
 		return api.post<Cart>(`/cart/customer/${customerId}/items`, data);
 	},
 
-	// PUT /cart/customer/{customerId}/items - Cập nhật số lượng sản phẩm
-	updateCartItem: (customerId: string, data: UpdateCartItemPayload) => {
-		return api.put<Cart>(`/cart/customer/${customerId}/items`, data);
+	// PATCH /cart/customer/{customerId}/items/{productId} - Cập nhật số lượng sản phẩm
+	updateCartItem: (customerId: string, productId: string, quantity: number) => {
+		return api.patch<Cart>(`/cart/customer/${customerId}/items/${productId}`, {
+			quantity,
+		});
 	},
 
-	// DELETE /cart/customer/{customerId}/items - Xóa sản phẩm khỏi giỏ hàng
-	removeFromCart: (customerId: string, data: RemoveFromCartPayload) => {
-		return api.delete<Cart>(`/cart/customer/${customerId}/items`, {
-			data,
-		});
+	// DELETE /cart/customer/{customerId}/items/{productId} - Xóa sản phẩm khỏi giỏ hàng
+	removeFromCart: (customerId: string, productId: string) => {
+		return api.delete<Cart>(`/cart/customer/${customerId}/items/${productId}`);
 	},
 
 	// DELETE /cart/customer/{customerId} - Xóa toàn bộ giỏ hàng
