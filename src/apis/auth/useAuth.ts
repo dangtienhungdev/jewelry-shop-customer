@@ -200,9 +200,14 @@ export const useUpdateProfile = (
 export const useChangePassword = (
 	options?: UseMutationOptions<ApiResponse<null>, Error, ChangePasswordPayload>
 ) => {
+	const { user } = useAuth();
+
 	return useMutation({
 		mutationFn: async (data: ChangePasswordPayload) => {
-			const response = await authApi.changePassword(data);
+			if (!user?._id) {
+				throw new Error('User ID not found');
+			}
+			const response = await authApi.changePassword({ ...data, id: user._id });
 			return response.data;
 		},
 		...options,

@@ -1,4 +1,4 @@
-import { useUpdateProfile } from '@/apis/auth';
+import { useChangePassword, useUpdateProfile } from '@/apis/auth';
 import { Button } from '@/components/ui/button';
 import {
 	Form,
@@ -9,16 +9,17 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { MainLayout } from '@/layouts';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Save, User } from 'lucide-react';
+import { Key, Lock, Save, User } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
-// Zod schema for form validation
+// Zod schema for profile update
 const updateProfileSchema = z.object({
 	fullName: z.string().min(2, {
 		message: 'Họ tên phải có ít nhất 2 ký tự.',
@@ -36,12 +37,32 @@ const updateProfileSchema = z.object({
 	}),
 });
 
+// Zod schema for change password
+const changePasswordSchema = z
+	.object({
+		currentPassword: z.string().min(6, {
+			message: 'Mật khẩu hiện tại phải có ít nhất 6 ký tự.',
+		}),
+		newPassword: z.string().min(6, {
+			message: 'Mật khẩu mới phải có ít nhất 6 ký tự.',
+		}),
+		confirmPassword: z.string().min(6, {
+			message: 'Xác nhận mật khẩu phải có ít nhất 6 ký tự.',
+		}),
+	})
+	.refine((data) => data.newPassword === data.confirmPassword, {
+		message: 'Mật khẩu xác nhận không khớp.',
+		path: ['confirmPassword'],
+	});
+
 type UpdateProfileFormValues = z.infer<typeof updateProfileSchema>;
+type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
 
 const UserInfoPage = () => {
 	const { user, setUser } = useAuth();
 
-	const form = useForm<UpdateProfileFormValues>({
+	// Form for profile update
+	const profileForm = useForm<UpdateProfileFormValues>({
 		resolver: zodResolver(updateProfileSchema),
 		defaultValues: {
 			fullName: '',
@@ -50,16 +71,26 @@ const UserInfoPage = () => {
 		},
 	});
 
+	// Form for change password
+	const passwordForm = useForm<ChangePasswordFormValues>({
+		resolver: zodResolver(changePasswordSchema),
+		defaultValues: {
+			currentPassword: '',
+			newPassword: '',
+			confirmPassword: '',
+		},
+	});
+
 	// Cập nhật form khi user data thay đổi
 	useEffect(() => {
 		if (user) {
-			form.reset({
+			profileForm.reset({
 				fullName: user.fullName || '',
 				phone: user.phone || '',
 				address: user.address || '',
 			});
 		}
-	}, [user, form]);
+	}, [user, profileForm]);
 
 	// Hook để cập nhật profile
 	const updateProfileMutation = useUpdateProfile({
@@ -75,9 +106,27 @@ const UserInfoPage = () => {
 		},
 	});
 
-	const onSubmit = (values: UpdateProfileFormValues) => {
-		console.log('🚀 ~ onSubmit ~ values:', values);
+	// Hook để đổi mật khẩu
+	const changePasswordMutation = useChangePassword({
+		onSuccess: (data) => {
+			toast.success(data.message || 'Đổi mật khẩu thành công!');
+			passwordForm.reset(); // Reset form sau khi thành công
+		},
+		onError: (error: any) => {
+			const errorMessage =
+				error?.response?.data?.message || 'Đổi mật khẩu thất bại!';
+			toast.error(errorMessage);
+		},
+	});
+
+	const onSubmitProfile = (values: UpdateProfileFormValues) => {
+		console.log('🚀 ~ onSubmitProfile ~ values:', values);
 		updateProfileMutation.mutate(values);
+	};
+
+	const onSubmitPassword = (values: ChangePasswordFormValues) => {
+		console.log('🚀 ~ onSubmitPassword ~ values:', values);
+		changePasswordMutation.mutate(values);
 	};
 
 	if (!user) {
@@ -103,7 +152,7 @@ const UserInfoPage = () => {
 							Thông Tin Cá Nhân
 						</h1>
 					</div>
-					<p className="text-gray-600">Cập nhật thông tin cá nhân của bạn</p>
+					<p className="text-gray-600">Quản lý thông tin cá nhân và bảo mật</p>
 				</div>
 
 				{/* User Info Card */}
@@ -125,139 +174,295 @@ const UserInfoPage = () => {
 					</div>
 				</div>
 
-				{/* Update Form */}
-				<div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-					<h3 className="text-lg font-medium text-gray-900 mb-6">
-						Cập Nhật Thông Tin
-					</h3>
+				{/* Tabs */}
+				<div className="bg-white rounded-lg shadow-md border border-gray-200">
+					<Tabs defaultValue="profile" className="w-full">
+						<TabsList className="grid w-full grid-cols-2 bg-gray-50 p-1 rounded-t-lg">
+							<TabsTrigger
+								value="profile"
+								className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+							>
+								<User className="h-4 w-4" />
+								Thông Tin Cá Nhân
+							</TabsTrigger>
+							<TabsTrigger
+								value="password"
+								className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+							>
+								<Lock className="h-4 w-4" />
+								Thay Đổi Mật Khẩu
+							</TabsTrigger>
+						</TabsList>
 
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-							{/* Full Name Field */}
-							<FormField
-								control={form.control}
-								name="fullName"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel className="text-sm font-medium text-gray-700">
-											Họ và Tên <span className="text-red-500">*</span>
-										</FormLabel>
-										<div className="flex items-center bg-white shadow-sm rounded-md border border-gray-300 focus-within:border-[#4a3c3c] focus-within:ring-1 focus-within:ring-[#4a3c3c]">
-											<div className="pl-4 pr-3 py-3 border-l-4 border-[#4a3c3c] flex items-center justify-center">
-												<i className="fas fa-user text-[#4a3c3c] text-sm"></i>
-											</div>
-											<FormControl>
-												<Input
-													placeholder="Nhập họ và tên của bạn"
-													className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none"
-													disabled={updateProfileMutation.isPending}
-													{...field}
-												/>
-											</FormControl>
-										</div>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							{/* Phone Field */}
-							<FormField
-								control={form.control}
-								name="phone"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel className="text-sm font-medium text-gray-700">
-											Số Điện Thoại <span className="text-red-500">*</span>
-										</FormLabel>
-										<div className="flex items-center bg-white shadow-sm rounded-md border border-gray-300 focus-within:border-[#4a3c3c] focus-within:ring-1 focus-within:ring-[#4a3c3c]">
-											<div className="pl-4 pr-3 py-3 border-l-4 border-[#4a3c3c] flex items-center justify-center">
-												<i className="fas fa-phone text-[#4a3c3c] text-sm"></i>
-											</div>
-											<FormControl>
-												<Input
-													type="tel"
-													placeholder="Nhập số điện thoại của bạn"
-													className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none"
-													disabled={updateProfileMutation.isPending}
-													{...field}
-												/>
-											</FormControl>
-										</div>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							{/* Email Field (Read-only) */}
-							<FormItem>
-								<FormLabel className="text-sm font-medium text-gray-700">
-									Email
-								</FormLabel>
-								<div className="flex items-center bg-gray-50 shadow-sm rounded-md border border-gray-300">
-									<div className="pl-4 pr-3 py-3 border-l-4 border-gray-400 flex items-center justify-center">
-										<i className="far fa-envelope text-gray-400 text-sm"></i>
-									</div>
-									<Input
-										value={user.email}
-										className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none bg-gray-50 text-gray-500"
-										disabled
-										readOnly
-									/>
-								</div>
-								<p className="text-xs text-gray-500 mt-1">
-									Email không thể thay đổi
+						{/* Profile Tab */}
+						<TabsContent value="profile" className="p-6">
+							<div className="mb-6">
+								<h3 className="text-lg font-medium text-gray-900 mb-2">
+									Cập Nhật Thông Tin
+								</h3>
+								<p className="text-sm text-gray-600">
+									Cập nhật thông tin cá nhân của bạn
 								</p>
-							</FormItem>
+							</div>
 
-							{/* Address Field */}
-							<FormField
-								control={form.control}
-								name="address"
-								render={({ field }) => (
+							<Form {...profileForm}>
+								<form
+									onSubmit={profileForm.handleSubmit(onSubmitProfile)}
+									className="space-y-6"
+								>
+									{/* Full Name Field */}
+									<FormField
+										control={profileForm.control}
+										name="fullName"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-sm font-medium text-gray-700">
+													Họ và Tên <span className="text-red-500">*</span>
+												</FormLabel>
+												<div className="flex items-center bg-white shadow-sm rounded-md border border-gray-300 focus-within:border-[#4a3c3c] focus-within:ring-1 focus-within:ring-[#4a3c3c]">
+													<div className="pl-4 pr-3 py-3 border-l-4 border-[#4a3c3c] flex items-center justify-center">
+														<i className="fas fa-user text-[#4a3c3c] text-sm"></i>
+													</div>
+													<FormControl>
+														<Input
+															placeholder="Nhập họ và tên của bạn"
+															className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none"
+															disabled={updateProfileMutation.isPending}
+															{...field}
+														/>
+													</FormControl>
+												</div>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									{/* Phone Field */}
+									<FormField
+										control={profileForm.control}
+										name="phone"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-sm font-medium text-gray-700">
+													Số Điện Thoại <span className="text-red-500">*</span>
+												</FormLabel>
+												<div className="flex items-center bg-white shadow-sm rounded-md border border-gray-300 focus-within:border-[#4a3c3c] focus-within:ring-1 focus-within:ring-[#4a3c3c]">
+													<div className="pl-4 pr-3 py-3 border-l-4 border-[#4a3c3c] flex items-center justify-center">
+														<i className="fas fa-phone text-[#4a3c3c] text-sm"></i>
+													</div>
+													<FormControl>
+														<Input
+															type="tel"
+															placeholder="Nhập số điện thoại của bạn"
+															className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none"
+															disabled={updateProfileMutation.isPending}
+															{...field}
+														/>
+													</FormControl>
+												</div>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									{/* Email Field (Read-only) */}
 									<FormItem>
 										<FormLabel className="text-sm font-medium text-gray-700">
-											Địa Chỉ <span className="text-red-500">*</span>
+											Email
 										</FormLabel>
-										<div className="flex items-center bg-white shadow-sm rounded-md border border-gray-300 focus-within:border-[#4a3c3c] focus-within:ring-1 focus-within:ring-[#4a3c3c]">
-											<div className="pl-4 pr-3 py-3 border-l-4 border-[#4a3c3c] flex items-center justify-center">
-												<i className="fas fa-map-marker-alt text-[#4a3c3c] text-sm"></i>
+										<div className="flex items-center bg-gray-50 shadow-sm rounded-md border border-gray-300">
+											<div className="pl-4 pr-3 py-3 border-l-4 border-gray-400 flex items-center justify-center">
+												<i className="far fa-envelope text-gray-400 text-sm"></i>
 											</div>
-											<FormControl>
-												<Input
-													placeholder="Nhập địa chỉ của bạn"
-													className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none"
-													disabled={updateProfileMutation.isPending}
-													{...field}
-												/>
-											</FormControl>
+											<Input
+												value={user.email}
+												className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none bg-gray-50 text-gray-500"
+												disabled
+												readOnly
+											/>
 										</div>
-										<FormMessage />
+										<p className="text-xs text-gray-500 mt-1">
+											Email không thể thay đổi
+										</p>
 									</FormItem>
-								)}
-							/>
 
-							{/* Submit Button */}
-							<div className="flex justify-end pt-4">
-								<Button
-									type="submit"
-									className="bg-[#b77900] text-white font-medium text-sm px-8 py-3 rounded-md shadow-md hover:bg-[#b77900]/90 transition-colors"
-									disabled={updateProfileMutation.isPending}
-								>
-									{updateProfileMutation.isPending ? (
-										<>
-											<i className="fas fa-spinner fa-spin mr-2"></i>
-											Đang cập nhật...
-										</>
-									) : (
-										<>
-											<Save className="mr-2 h-4 w-4" />
-											Cập Nhật Thông Tin
-										</>
-									)}
-								</Button>
+									{/* Address Field */}
+									<FormField
+										control={profileForm.control}
+										name="address"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-sm font-medium text-gray-700">
+													Địa Chỉ <span className="text-red-500">*</span>
+												</FormLabel>
+												<div className="flex items-center bg-white shadow-sm rounded-md border border-gray-300 focus-within:border-[#4a3c3c] focus-within:ring-1 focus-within:ring-[#4a3c3c]">
+													<div className="pl-4 pr-3 py-3 border-l-4 border-[#4a3c3c] flex items-center justify-center">
+														<i className="fas fa-map-marker-alt text-[#4a3c3c] text-sm"></i>
+													</div>
+													<FormControl>
+														<Input
+															placeholder="Nhập địa chỉ của bạn"
+															className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none"
+															disabled={updateProfileMutation.isPending}
+															{...field}
+														/>
+													</FormControl>
+												</div>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									{/* Submit Button */}
+									<div className="flex justify-end pt-4">
+										<Button
+											type="submit"
+											className="bg-[#b77900] text-white font-medium text-sm px-8 py-3 rounded-md shadow-md hover:bg-[#b77900]/90 transition-colors"
+											disabled={updateProfileMutation.isPending}
+										>
+											{updateProfileMutation.isPending ? (
+												<>
+													<i className="fas fa-spinner fa-spin mr-2"></i>
+													Đang cập nhật...
+												</>
+											) : (
+												<>
+													<Save className="mr-2 h-4 w-4" />
+													Cập Nhật Thông Tin
+												</>
+											)}
+										</Button>
+									</div>
+								</form>
+							</Form>
+						</TabsContent>
+
+						{/* Password Tab */}
+						<TabsContent value="password" className="p-6">
+							<div className="mb-6">
+								<h3 className="text-lg font-medium text-gray-900 mb-2">
+									Thay Đổi Mật Khẩu
+								</h3>
+								<p className="text-sm text-gray-600">
+									Cập nhật mật khẩu để bảo mật tài khoản của bạn
+								</p>
 							</div>
-						</form>
-					</Form>
+
+							<Form {...passwordForm}>
+								<form
+									onSubmit={passwordForm.handleSubmit(onSubmitPassword)}
+									className="space-y-6"
+								>
+									{/* Current Password Field */}
+									<FormField
+										control={passwordForm.control}
+										name="currentPassword"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-sm font-medium text-gray-700">
+													Mật Khẩu Hiện Tại{' '}
+													<span className="text-red-500">*</span>
+												</FormLabel>
+												<div className="flex items-center bg-white shadow-sm rounded-md border border-gray-300 focus-within:border-[#4a3c3c] focus-within:ring-1 focus-within:ring-[#4a3c3c]">
+													<div className="pl-4 pr-3 py-3 border-l-4 border-[#4a3c3c] flex items-center justify-center">
+														<i className="fas fa-lock text-[#4a3c3c] text-sm"></i>
+													</div>
+													<FormControl>
+														<Input
+															type="password"
+															placeholder="Nhập mật khẩu hiện tại"
+															className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none"
+															disabled={changePasswordMutation.isPending}
+															{...field}
+														/>
+													</FormControl>
+												</div>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									{/* New Password Field */}
+									<FormField
+										control={passwordForm.control}
+										name="newPassword"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-sm font-medium text-gray-700">
+													Mật Khẩu Mới <span className="text-red-500">*</span>
+												</FormLabel>
+												<div className="flex items-center bg-white shadow-sm rounded-md border border-gray-300 focus-within:border-[#4a3c3c] focus-within:ring-1 focus-within:ring-[#4a3c3c]">
+													<div className="pl-4 pr-3 py-3 border-l-4 border-[#4a3c3c] flex items-center justify-center">
+														<i className="fas fa-key text-[#4a3c3c] text-sm"></i>
+													</div>
+													<FormControl>
+														<Input
+															type="password"
+															placeholder="Nhập mật khẩu mới"
+															className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none"
+															disabled={changePasswordMutation.isPending}
+															{...field}
+														/>
+													</FormControl>
+												</div>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									{/* Confirm Password Field */}
+									<FormField
+										control={passwordForm.control}
+										name="confirmPassword"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-sm font-medium text-gray-700">
+													Xác Nhận Mật Khẩu{' '}
+													<span className="text-red-500">*</span>
+												</FormLabel>
+												<div className="flex items-center bg-white shadow-sm rounded-md border border-gray-300 focus-within:border-[#4a3c3c] focus-within:ring-1 focus-within:ring-[#4a3c3c]">
+													<div className="pl-4 pr-3 py-3 border-l-4 border-[#4a3c3c] flex items-center justify-center">
+														<i className="fas fa-key text-[#4a3c3c] text-sm"></i>
+													</div>
+													<FormControl>
+														<Input
+															type="password"
+															placeholder="Nhập lại mật khẩu mới"
+															className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none"
+															disabled={changePasswordMutation.isPending}
+															{...field}
+														/>
+													</FormControl>
+												</div>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									{/* Submit Button */}
+									<div className="flex justify-end pt-4">
+										<Button
+											type="submit"
+											className="bg-[#b77900] text-white font-medium text-sm px-8 py-3 rounded-md shadow-md hover:bg-[#b77900]/90 transition-colors"
+											disabled={changePasswordMutation.isPending}
+										>
+											{changePasswordMutation.isPending ? (
+												<>
+													<i className="fas fa-spinner fa-spin mr-2"></i>
+													Đang đổi mật khẩu...
+												</>
+											) : (
+												<>
+													<Key className="mr-2 h-4 w-4" />
+													Đổi Mật Khẩu
+												</>
+											)}
+										</Button>
+									</div>
+								</form>
+							</Form>
+						</TabsContent>
+					</Tabs>
 				</div>
 
 				{/* Additional Info */}
@@ -272,6 +477,7 @@ const UserInfoPage = () => {
 									Vui lòng cung cấp thông tin chính xác để thuận tiện cho việc
 									giao hàng
 								</li>
+								<li>Mật khẩu mới phải có ít nhất 6 ký tự</li>
 								<li>Thông tin của bạn sẽ được bảo mật tuyệt đối</li>
 							</ul>
 						</div>

@@ -51,9 +51,13 @@ export const authApi = {
 		return api.patch<ApiResponse<Customer>>(`/customers/${id}`, updateData);
 	},
 
-	// PATCH /auth/change-password - Đổi mật khẩu
-	changePassword: (data: ChangePasswordPayload) => {
-		return api.patch<ApiResponse<null>>('/auth/change-password', data);
+	// PATCH /customers/{id}/change-password - Đổi mật khẩu
+	changePassword: (data: ChangePasswordPayload & { id: string }) => {
+		const { id, ...passwordData } = data;
+		return api.patch<ApiResponse<null>>(
+			`/customers/${id}/change-password`,
+			passwordData
+		);
 	},
 
 	// POST /auth/forgot-password - Quên mật khẩu
