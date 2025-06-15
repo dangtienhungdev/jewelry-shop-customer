@@ -13,6 +13,7 @@ interface AuthContextType {
 	}) => void;
 	logout: () => void;
 	updateUser: (user: Customer) => void;
+	setUser: (user: Customer | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -126,6 +127,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		localStorage.setItem('user', JSON.stringify(updatedUser));
 	};
 
+	const setUserData = (userData: Customer | null) => {
+		setUser(userData);
+		if (userData) {
+			localStorage.setItem('user', JSON.stringify(userData));
+		} else {
+			localStorage.removeItem('user');
+		}
+	};
+
 	const value: AuthContextType = {
 		isAuthenticated,
 		user,
@@ -134,6 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		login,
 		logout,
 		updateUser,
+		setUser: setUserData,
 	};
 
 	// Hiển thị loading trong khi khởi tạo

@@ -172,11 +172,14 @@ export const useUpdateProfile = (
 	>
 ) => {
 	const queryClient = useQueryClient();
-	const { updateUser } = useAuth();
+	const { updateUser, user } = useAuth();
 
 	return useMutation({
 		mutationFn: async (data: UpdateProfilePayload) => {
-			const response = await authApi.updateProfile(data);
+			if (!user?._id) {
+				throw new Error('User ID not found');
+			}
+			const response = await authApi.updateProfile({ ...data, id: user._id });
 			return response.data;
 		},
 		onSuccess: (data) => {

@@ -45,9 +45,10 @@ export const authApi = {
 		return api.get<ApiResponse<Customer>>('/auth/me');
 	},
 
-	// PUT /auth/profile - Cập nhật thông tin cá nhân
-	updateProfile: (data: UpdateProfilePayload) => {
-		return api.put<ApiResponse<Customer>>('/auth/profile', data);
+	// PUT /customers/{id} - Cập nhật thông tin cá nhân
+	updateProfile: (data: UpdateProfilePayload & { id: string }) => {
+		const { id, ...updateData } = data;
+		return api.patch<ApiResponse<Customer>>(`/customers/${id}`, updateData);
 	},
 
 	// PATCH /auth/change-password - Đổi mật khẩu
