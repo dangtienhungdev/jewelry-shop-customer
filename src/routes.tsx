@@ -11,6 +11,7 @@ import HomePage from './pages/home/page';
 import PaymentPage from './pages/payment/page';
 import ProductDetailPage from './pages/product-detail/page';
 import ProductPage from './pages/products/page';
+import ThongTinPage from './pages/thong-tin/page';
 
 const routes = createBrowserRouter([
 	{
@@ -28,6 +29,10 @@ const routes = createBrowserRouter([
 	{
 		path: '/cart',
 		element: <CartPage />,
+	},
+	{
+		path: '/thong-tin',
+		element: <ThongTinPage />,
 	},
 	{
 		path: '/login',

@@ -86,7 +86,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 				<Link to="/products" className="hover:text-gray-900 transition-colors">
 					SẢN PHẨM
 				</Link>
-				<Link to="/style" className="hover:text-gray-900 transition-colors">
+				<Link to="/thong-tin" className="hover:text-gray-900 transition-colors">
 					PHONG CÁCH
 				</Link>
 				<Link to="/system" className="hover:text-gray-900 transition-colors">
