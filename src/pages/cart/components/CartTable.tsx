@@ -1,85 +1,60 @@
-import type { CartItem as CartItemType } from '@/types/cart.type';
+import { useRemoveFromCart, useUpdateCartItem } from '@/apis/cart';
+import type { Cart } from '@/types/cart.type';
 import React, { useState } from 'react';
 import CartItem from './CartItem';
 
-const CartTable: React.FC = () => {
-	// Mock data - trong thực tế sẽ sử dụng context hoặc state management
-	const [cartItems, setCartItems] = useState<CartItemType[]>([
-		{
-			id: '1',
-			productId: 'prod1',
-			name: 'R MIDI GREEN',
-			description: 'Đẹp với những người phụ nữ trung niên',
-			price: 1199000,
-			quantity: 1,
-			image:
-				'https://storage.googleapis.com/a1aa/image/b02ea04f-f3f7-40b9-f3a7-4a76e7290d2f.jpg',
-			isSelected: false,
-		},
-		{
-			id: '2',
-			productId: 'prod2',
-			name: 'R MIDI BIG 6MM GEM',
-			description: 'Rất đẹp',
-			price: 1299000,
-			quantity: 2,
-			image:
-				'https://storage.googleapis.com/a1aa/image/cbae6a4e-dc18-4a66-4ffe-11a5e4f314c5.jpg',
-			isSelected: true,
-		},
-		{
-			id: '3',
-			productId: 'prod3',
-			name: 'R MIDI BIG 6MM GEM',
-			description: 'Rất đẹp',
-			price: 1199000,
-			quantity: 1,
-			image:
-				'https://storage.googleapis.com/a1aa/image/cbae6a4e-dc18-4a66-4ffe-11a5e4f314c5.jpg',
-			isSelected: false,
-		},
-		{
-			id: '4',
-			productId: 'prod4',
-			name: 'R MIDI GREEN',
-			description: 'Đẹp với những người phụ nữ trung niên',
-			price: 1299000,
-			quantity: 1,
-			image:
-				'https://storage.googleapis.com/a1aa/image/b02ea04f-f3f7-40b9-f3a7-4a76e7290d2f.jpg',
-			isSelected: true,
-		},
-	]);
+interface CartTableProps {
+	cart: Cart;
+}
 
-	const handleToggleSelect = (itemId: string) => {
-		setCartItems((items) =>
-			items.map((item) =>
-				item.id === itemId ? { ...item, isSelected: !item.isSelected } : item
-			)
+const CartTable: React.FC<CartTableProps> = ({ cart }) => {
+	const [selectedItems, setSelectedItems] = useState<string[]>(
+		cart.items.map((item) => item.product.id)
+	);
+
+	// Hooks để cập nhật và xóa sản phẩm
+	const updateCartItemMutation = useUpdateCartItem();
+	const removeFromCartMutation = useRemoveFromCart();
+
+	const handleToggleSelect = (productId: string) => {
+		setSelectedItems((prev) =>
+			prev.includes(productId)
+				? prev.filter((id) => id !== productId)
+				: [...prev, productId]
 		);
 	};
 
 	const handleToggleSelectAll = () => {
-		const allSelected = cartItems.every((item) => item.isSelected);
-		setCartItems((items) =>
-			items.map((item) => ({ ...item, isSelected: !allSelected }))
+		const allSelected = selectedItems.length === cart.items.length;
+		setSelectedItems(
+			allSelected ? [] : cart.items.map((item) => item.product.id)
 		);
 	};
 
-	const handleUpdateQuantity = (itemId: string, quantity: number) => {
-		setCartItems((items) =>
-			items.map((item) => (item.id === itemId ? { ...item, quantity } : item))
-		);
+	const handleUpdateQuantity = (productId: string, quantity: number) => {
+		if (quantity <= 0) {
+			handleRemoveItem(productId);
+			return;
+		}
+
+		updateCartItemMutation.mutate({
+			productId,
+			quantity,
+		});
 	};
 
-	const handleRemoveItem = (itemId: string) => {
-		setCartItems((items) => items.filter((item) => item.id !== itemId));
+	const handleRemoveItem = (productId: string) => {
+		removeFromCartMutation.mutate({
+			productId,
+		});
+		// Xóa khỏi selected items
+		setSelectedItems((prev) => prev.filter((id) => id !== productId));
 	};
 
 	const allSelected =
-		cartItems.length > 0 && cartItems.every((item) => item.isSelected);
+		cart.items.length > 0 && selectedItems.length === cart.items.length;
 
-	if (cartItems.length === 0) {
+	if (cart.items.length === 0) {
 		return (
 			<section className="px-6 py-12">
 				<div className="text-center">
@@ -122,13 +97,16 @@ const CartTable: React.FC = () => {
 
 			{/* Table Rows */}
 			<div className="divide-y divide-gray-200">
-				{cartItems.map((item) => (
+				{cart.items.map((item) => (
 					<CartItem
-						key={item.id}
+						key={item.product.id}
 						item={item}
+						isSelected={selectedItems.includes(item.product.id)}
 						onToggleSelect={handleToggleSelect}
 						onUpdateQuantity={handleUpdateQuantity}
 						onRemove={handleRemoveItem}
+						isUpdating={updateCartItemMutation.isPending}
+						isRemoving={removeFromCartMutation.isPending}
 					/>
 				))}
 			</div>

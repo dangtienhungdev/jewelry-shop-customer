@@ -1,19 +1,45 @@
-export interface CartItem {
+export interface CartProduct {
 	id: string;
-	productId: string;
-	name: string;
-	description: string;
+	productName: string;
 	price: number;
+	discountedPrice: number;
+	images: string[];
+	material: string;
+	stockQuantity: number;
+}
+
+export interface CartItem {
+	product: CartProduct;
 	quantity: number;
-	image: string;
-	isSelected: boolean;
+	price: number;
+	discountedPrice: number;
+	effectivePrice: number;
+	subtotal: number;
+	addedAt: string;
 }
 
 export interface Cart {
+	id: string;
+	customerId: string;
 	items: CartItem[];
 	totalItems: number;
-	totalPrice: number;
-	selectedItems: CartItem[];
+	totalAmount: number;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface AddToCartPayload {
+	productId: string;
+	quantity: number;
+}
+
+export interface UpdateCartItemPayload {
+	productId: string;
+	quantity: number;
+}
+
+export interface RemoveFromCartPayload {
+	productId: string;
 }
 
 export interface CartContextType {

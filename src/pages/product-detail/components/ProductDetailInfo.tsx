@@ -1,6 +1,10 @@
+import { useAddToCart } from '@/apis/cart';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Product } from '@/types/product.type';
 import { Minus, Plus, ShoppingCart } from 'lucide-react';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface ProductDetailInfoProps {
 	product: Product;
@@ -8,6 +12,11 @@ interface ProductDetailInfoProps {
 
 const ProductDetailInfo: React.FC<ProductDetailInfoProps> = ({ product }) => {
 	const [quantity, setQuantity] = useState(1);
+	const { isAuthenticated } = useAuth();
+	const navigate = useNavigate();
+
+	// Hook để thêm sản phẩm vào giỏ hàng
+	const addToCartMutation = useAddToCart();
 
 	const formatPrice = (price: number): string => {
 		return new Intl.NumberFormat('vi-VN', {
@@ -23,13 +32,53 @@ const ProductDetailInfo: React.FC<ProductDetailInfoProps> = ({ product }) => {
 	};
 
 	const handleAddToCart = () => {
-		console.log('Add to cart:', { productId: product.id, quantity });
-		alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
+		// Kiểm tra đăng nhập
+		if (!isAuthenticated) {
+			toast.error('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!');
+			navigate('/login');
+			return;
+		}
+
+		// Kiểm tra tồn kho
+		if (product.stockQuantity <= 0) {
+			toast.error('Sản phẩm đã hết hàng!');
+			return;
+		}
+
+		// Gọi API thêm vào giỏ hàng
+		addToCartMutation.mutate({
+			productId: product.id,
+			quantity: quantity,
+		});
 	};
 
 	const handleBuyNow = () => {
-		console.log('Buy now:', { productId: product.id, quantity });
-		alert(`Mua ngay ${quantity} sản phẩm!`);
+		// Kiểm tra đăng nhập
+		if (!isAuthenticated) {
+			toast.error('Vui lòng đăng nhập để mua hàng!');
+			navigate('/login');
+			return;
+		}
+
+		// Kiểm tra tồn kho
+		if (product.stockQuantity <= 0) {
+			toast.error('Sản phẩm đã hết hàng!');
+			return;
+		}
+
+		// Thêm vào giỏ hàng trước, sau đó chuyển đến trang thanh toán
+		addToCartMutation.mutate(
+			{
+				productId: product.id,
+				quantity: quantity,
+			},
+			{
+				onSuccess: () => {
+					// Chuyển đến trang giỏ hàng hoặc thanh toán
+					navigate('/cart');
+				},
+			}
+		);
 	};
 
 	const renderStars = (rating: number) => {
@@ -124,20 +173,44 @@ const ProductDetailInfo: React.FC<ProductDetailInfoProps> = ({ product }) => {
 				<div className="flex space-x-4 mb-6">
 					<button
 						onClick={handleAddToCart}
-						disabled={product.stockQuantity <= 0}
+						disabled={product.stockQuantity <= 0 || addToCartMutation.isPending}
 						className="flex-1 cursor-pointer bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-md hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
 					>
-						Thêm vào giỏ
+						{addToCartMutation.isPending ? (
+							<>
+								<i className="fas fa-spinner fa-spin mr-2"></i>
+								Đang thêm...
+							</>
+						) : (
+							'Thêm vào giỏ'
+						)}
 					</button>
 					<button
 						onClick={handleBuyNow}
-						disabled={product.stockQuantity <= 0}
+						disabled={product.stockQuantity <= 0 || addToCartMutation.isPending}
 						className="flex-1 cursor-pointer flex items-center justify-center bg-[#C28B1B] text-white font-semibold py-3 px-6 rounded-md hover:bg-[#a67a16] disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
 					>
 						<ShoppingCart className="w-4 h-4 mr-2" />
-						Mua ngay
+						{addToCartMutation.isPending ? 'Đang xử lý...' : 'Mua ngay'}
 					</button>
 				</div>
+
+				{/* Login Prompt for Unauthenticated Users */}
+				{!isAuthenticated && (
+					<div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+						<p className="text-sm text-blue-700">
+							<i className="fas fa-info-circle mr-2"></i>
+							Vui lòng{' '}
+							<button
+								onClick={() => navigate('/login')}
+								className="font-semibold text-blue-800 hover:underline"
+							>
+								đăng nhập
+							</button>{' '}
+							để thêm sản phẩm vào giỏ hàng và mua hàng.
+						</p>
+					</div>
+				)}
 
 				{/* Description */}
 				<div className="mb-8">

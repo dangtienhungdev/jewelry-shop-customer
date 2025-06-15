@@ -1,4 +1,6 @@
 import { useLogout } from '@/apis/auth';
+import { useCart } from '@/apis/cart';
+import { Badge } from '@/components/ui/badge';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -27,6 +29,9 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 	const navigate = useNavigate();
 	const { isAuthenticated, user, refreshToken } = useAuth();
+
+	// Hook để lấy giỏ hàng
+	const { data: cart, isLoading: isCartLoading } = useCart();
 
 	// Hook để đăng xuất
 	const logoutMutation = useLogout({
@@ -60,6 +65,10 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 		}
 	};
 
+	// Tính tổng số lượng sản phẩm trong giỏ hàng
+	const cartItemCount =
+		isAuthenticated && cart && !isCartLoading ? cart.totalItems || 0 : 0;
+
 	return (
 		<header
 			className={`flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full ${className}`}
@@ -86,13 +95,24 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 			</nav>
 
 			<div className="flex space-x-6 text-gray-900 text-lg items-center">
-				<button
-					className="hover:text-gray-600 transition-colors cursor-pointer"
-					aria-label="Giỏ hàng"
-					onClick={handleCartClick}
-				>
-					<ShoppingCart size={20} />
-				</button>
+				{/* Cart Icon with Badge */}
+				<div className="relative">
+					<button
+						className="hover:text-gray-600 transition-colors cursor-pointer"
+						aria-label="Giỏ hàng"
+						onClick={handleCartClick}
+					>
+						<ShoppingCart size={20} />
+					</button>
+					{cartItemCount > 0 && (
+						<Badge
+							variant="destructive"
+							className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs font-bold bg-red-500 text-white rounded-full"
+						>
+							{cartItemCount > 99 ? '99+' : cartItemCount}
+						</Badge>
+					)}
+				</div>
 
 				{/* User Authentication Area */}
 				{isAuthenticated ? (
