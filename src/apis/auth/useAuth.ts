@@ -1,3 +1,4 @@
+import { useAuth } from '@/contexts/AuthContext';
 import type { ApiResponse } from '@/types/api.type';
 import type {
 	ChangePasswordPayload,
@@ -28,8 +29,10 @@ export const authKeys = {
 	me: () => [...authKeys.all, 'me'] as const,
 };
 
-// Hook để lấy thông tin user hiện tại
+// Hook để lấy thông tin user hiện tại (chỉ khi có token)
 export const useCurrentUser = (options?: UseQueryOptions<Customer>) => {
+	const { isAuthenticated } = useAuth();
+
 	return useQuery({
 		queryKey: authKeys.me(),
 		queryFn: async () => {
@@ -38,6 +41,7 @@ export const useCurrentUser = (options?: UseQueryOptions<Customer>) => {
 		},
 		staleTime: 10 * 60 * 1000, // 10 minutes
 		retry: false, // Không retry khi unauthorized
+		enabled: isAuthenticated,
 		...options,
 	});
 };
@@ -48,6 +52,7 @@ export const useLogin = (
 ) => {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
+	const { login } = useAuth();
 
 	return useMutation({
 		mutationFn: async (data: LoginPayload) => {
@@ -56,9 +61,13 @@ export const useLogin = (
 		},
 		onSuccess: (data) => {
 			console.log('🚀 ~ data:', data);
-			// Lưu token vào localStorage hoặc cookie
-			localStorage.setItem('accessToken', data.data.accessToken);
-			localStorage.setItem('refreshToken', data.data.refreshToken);
+
+			// Sử dụng AuthContext để lưu thông tin auth
+			login({
+				accessToken: data.data.accessToken,
+				refreshToken: data.data.refreshToken,
+				user: data.data.customer,
+			});
 
 			// Set user data vào cache
 			queryClient.setQueryData(authKeys.me(), data.data.customer);
@@ -128,6 +137,7 @@ export const useLogout = (
 	options?: UseMutationOptions<ApiResponse<null>, Error, LogoutPayload>
 ) => {
 	const queryClient = useQueryClient();
+	const { logout } = useAuth();
 
 	return useMutation({
 		mutationFn: async (data: LogoutPayload) => {
@@ -135,15 +145,19 @@ export const useLogout = (
 			return response.data;
 		},
 		onSuccess: () => {
-			// Xóa token khỏi localStorage
-			localStorage.removeItem('accessToken');
-			localStorage.removeItem('refreshToken');
+			// Sử dụng AuthContext để clear auth state
+			logout();
 
 			// Clear toàn bộ cache
 			queryClient.clear();
 
 			// Hoặc chỉ clear auth cache
 			queryClient.removeQueries({ queryKey: authKeys.all });
+		},
+		onError: () => {
+			// Ngay cả khi API call thất bại, vẫn logout local
+			logout();
+			queryClient.clear();
 		},
 		...options,
 	});
@@ -158,6 +172,7 @@ export const useUpdateProfile = (
 	>
 ) => {
 	const queryClient = useQueryClient();
+	const { updateUser } = useAuth();
 
 	return useMutation({
 		mutationFn: async (data: UpdateProfilePayload) => {
@@ -165,6 +180,9 @@ export const useUpdateProfile = (
 			return response.data;
 		},
 		onSuccess: (data) => {
+			// Cập nhật user data trong AuthContext
+			updateUser(data.data);
+
 			// Cập nhật user data trong cache
 			queryClient.setQueryData(authKeys.me(), data.data);
 

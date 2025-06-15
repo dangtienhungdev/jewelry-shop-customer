@@ -1,6 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom';
+import PrivateRoute from './components/PrivateRoute';
 import LoginPage from './pages/(auth)/login/page';
 import RegisterPage from './pages/(auth)/register/page';
+import OrderHistoryPage from './pages/(user)/order-history/page';
+import UserInfoPage from './pages/(user)/user-info/page';
 import CartPage from './pages/cart/page';
 import HomePage from './pages/home/page';
 import PaymentPage from './pages/payment/page';
@@ -25,16 +28,54 @@ const routes = createBrowserRouter([
 		element: <CartPage />,
 	},
 	{
-		path: '/payment',
-		element: <PaymentPage />,
-	},
-	{
 		path: '/login',
 		element: <LoginPage />,
 	},
 	{
 		path: '/register',
 		element: <RegisterPage />,
+	},
+	// Private Routes - Cần authentication
+	{
+		path: '/payment',
+		element: (
+			<PrivateRoute>
+				<PaymentPage />
+			</PrivateRoute>
+		),
+	},
+	{
+		path: '/user-info/:id',
+		element: (
+			<PrivateRoute>
+				<UserInfoPage />
+			</PrivateRoute>
+		),
+	},
+	{
+		path: '/order-history/:id',
+		element: (
+			<PrivateRoute>
+				<OrderHistoryPage />
+			</PrivateRoute>
+		),
+	},
+	// Thêm các route profile và orders cho dropdown menu
+	{
+		path: '/profile',
+		element: (
+			<PrivateRoute>
+				<UserInfoPage />
+			</PrivateRoute>
+		),
+	},
+	{
+		path: '/orders',
+		element: (
+			<PrivateRoute>
+				<OrderHistoryPage />
+			</PrivateRoute>
+		),
 	},
 ]);
 

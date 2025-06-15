@@ -1,6 +1,24 @@
-import { Menu, ShoppingCart, User } from 'lucide-react';
+import { useLogout } from '@/apis/auth';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+	LogOut,
+	Menu,
+	Package,
+	ShoppingCart,
+	User,
+	UserCircle,
+} from 'lucide-react';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface HeaderProps {
 	className?: string;
@@ -8,10 +26,38 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 	const navigate = useNavigate();
+	const { isAuthenticated, user, refreshToken } = useAuth();
 
-	// navigate page cart
+	// Hook để đăng xuất
+	const logoutMutation = useLogout({
+		onSuccess: () => {
+			toast.success('Đăng xuất thành công!');
+			navigate('/');
+		},
+		onError: () => {
+			toast.error('Đăng xuất thất bại!');
+		},
+	});
+
+	// Navigate page cart
 	const handleCartClick = () => {
 		navigate('/cart');
+	};
+
+	// Navigate to login
+	const handleLoginClick = () => {
+		navigate('/login');
+	};
+
+	// Handle logout
+	const handleLogout = () => {
+		if (refreshToken) {
+			logoutMutation.mutate({ refreshToken });
+		} else {
+			// Nếu không có refresh token, chỉ clear local state
+			toast.success('Đăng xuất thành công!');
+			navigate('/');
+		}
 	};
 
 	return (
@@ -39,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 				</Link>
 			</nav>
 
-			<div className="flex space-x-6 text-gray-900 text-lg">
+			<div className="flex space-x-6 text-gray-900 text-lg items-center">
 				<button
 					className="hover:text-gray-600 transition-colors cursor-pointer"
 					aria-label="Giỏ hàng"
@@ -47,12 +93,66 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 				>
 					<ShoppingCart size={20} />
 				</button>
-				<button
-					className="hover:text-gray-600 transition-colors cursor-pointer"
-					aria-label="Tài khoản"
-				>
-					<User size={20} />
-				</button>
+
+				{/* User Authentication Area */}
+				{isAuthenticated ? (
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<button
+								className="hover:text-gray-600 transition-colors cursor-pointer"
+								aria-label="Tài khoản"
+							>
+								<User size={20} />
+							</button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent className="w-56" align="end" forceMount>
+							<DropdownMenuLabel className="font-normal">
+								<div className="flex flex-col space-y-1">
+									<p className="text-sm font-medium leading-none">
+										{user?.fullName || 'Người dùng'}
+									</p>
+									<p className="text-xs leading-none text-muted-foreground">
+										{user?.email}
+									</p>
+								</div>
+							</DropdownMenuLabel>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								className="cursor-pointer"
+								onClick={() => navigate('/profile')}
+							>
+								<UserCircle className="mr-2 h-4 w-4" />
+								<span>Thông tin cá nhân</span>
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								className="cursor-pointer"
+								onClick={() => navigate('/orders')}
+							>
+								<Package className="mr-2 h-4 w-4" />
+								<span>Đơn hàng của tôi</span>
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								className="cursor-pointer text-red-600 focus:text-red-600"
+								onClick={handleLogout}
+								disabled={logoutMutation.isPending}
+							>
+								<LogOut className="mr-2 h-4 w-4" />
+								<span>
+									{logoutMutation.isPending ? 'Đang đăng xuất...' : 'Đăng xuất'}
+								</span>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				) : (
+					<button
+						className="text-sm font-medium hover:text-gray-600 transition-colors cursor-pointer"
+						onClick={handleLoginClick}
+					>
+						Đăng nhập
+					</button>
+				)}
+
 				<button
 					className="md:hidden hover:text-gray-600 transition-colors"
 					aria-label="Menu"

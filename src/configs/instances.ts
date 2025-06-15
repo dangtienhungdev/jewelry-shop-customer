@@ -24,20 +24,21 @@ const apiInstance: AxiosInstance = axios.create({
 apiInstance.interceptors.request.use(
 	(config: InternalAxiosRequestConfig) => {
 		// Add auth token if available
-		const token = localStorage.getItem('access_token');
+		const token = localStorage.getItem('accessToken');
 		if (token && config.headers) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}
 
 		// Log request in development
-		// if (import.meta.env.DEV) {
-		// 	console.log('🚀 API Request:', {
-		// 		method: config.method?.toUpperCase(),
-		// 		url: `${config.baseURL}${config.url}`,
-		// 		data: config.data,
-		// 		params: config.params,
-		// 	});
-		// }
+		if (import.meta.env.DEV) {
+			console.log('🚀 API Request:', {
+				method: config.method?.toUpperCase(),
+				url: `${config.baseURL}${config.url}`,
+				data: config.data,
+				params: config.params,
+				headers: config.headers,
+			});
+		}
 
 		return config;
 	},
@@ -51,27 +52,68 @@ apiInstance.interceptors.request.use(
 apiInstance.interceptors.response.use(
 	(response: AxiosResponse) => {
 		// Log response in development
-		// if (import.meta.env.DEV) {
-		// 	console.log('✅ API Response:', {
-		// 		status: response.status,
-		// 		url: response.config.url,
-		// 		data: response.data,
-		// 	});
-		// }
+		if (import.meta.env.DEV) {
+			console.log('✅ API Response:', {
+				status: response.status,
+				url: response.config.url,
+				data: response.data,
+			});
+		}
 
 		return response;
 	},
-	(error) => {
+	async (error) => {
+		const originalRequest = error.config;
+
 		// Handle common errors
 		if (error.response) {
 			const { status, data } = error.response;
 
 			switch (status) {
 				case 401:
-					// Unauthorized - clear token and redirect to login
-					localStorage.removeItem('access_token');
-					console.error('🔒 Unauthorized access');
-					// You can add redirect logic here
+					// Unauthorized - try to refresh token
+					if (!originalRequest._retry) {
+						originalRequest._retry = true;
+
+						try {
+							const refreshToken = localStorage.getItem('refreshToken');
+							if (refreshToken) {
+								// Attempt to refresh token
+								const refreshResponse = await axios.post(
+									`${BASE_URL}/customers/refresh-token`,
+									{
+										refreshToken,
+									}
+								);
+
+								const {
+									accessToken: newAccessToken,
+									refreshToken: newRefreshToken,
+								} = refreshResponse.data.data;
+
+								// Update tokens in localStorage
+								localStorage.setItem('accessToken', newAccessToken);
+								localStorage.setItem('refreshToken', newRefreshToken);
+
+								// Update the original request with new token
+								originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+								// Retry the original request
+								return apiInstance(originalRequest);
+							}
+						} catch (refreshError) {
+							console.error('🔄 Token refresh failed:', refreshError);
+						}
+					}
+
+					// If refresh failed or no refresh token, clear auth and redirect
+					localStorage.removeItem('accessToken');
+					localStorage.removeItem('refreshToken');
+					localStorage.removeItem('user');
+					console.error('🔒 Unauthorized access - redirecting to login');
+
+					// Trigger a custom event to notify the app about logout
+					window.dispatchEvent(new CustomEvent('auth:logout'));
 					break;
 				case 403:
 					console.error('🚫 Forbidden access');
