@@ -58,7 +58,6 @@ const FAQSection: React.FC = () => {
 				))}
 			</div>
 			<div className="mt-6 max-w-4xl mx-auto text-center">
-				<p className="mb-4 text-xs md:text-sm">Bạn có câu hỏi nào khác?</p>
 				<Button className="text-xs md:text-sm font-semibold py-2 px-6">
 					Gửi câu hỏi
 				</Button>

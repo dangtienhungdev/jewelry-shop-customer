@@ -78,6 +78,11 @@ export const useLogin = (
 			toast.success(data.message || 'Đăng nhập thành công!');
 			navigate('/'); // Chuyển về trang chủ
 		},
+		onError: (error: any) => {
+			toast.error(
+				error?.response?.data?.message || 'Email hoặc mật khẩu không chính xác!'
+			);
+		},
 		...options,
 	});
 };
