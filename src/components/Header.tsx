@@ -1,6 +1,3 @@
-import { useLogout } from '@/apis/auth';
-import { useCart } from '@/apis/cart';
-import { Badge } from '@/components/ui/badge';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -9,7 +6,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/contexts/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
 import {
 	LogOut,
 	Menu,
@@ -18,9 +15,12 @@ import {
 	User,
 	UserCircle,
 } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/apis/cart';
 
 interface HeaderProps {
 	className?: string;
@@ -28,21 +28,10 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 	const navigate = useNavigate();
-	const { isAuthenticated, user, refreshToken } = useAuth();
+	const { isAuthenticated, user, logout } = useAuth();
 
 	// Hook để lấy giỏ hàng
 	const { data: cart, isLoading: isCartLoading } = useCart();
-
-	// Hook để đăng xuất
-	const logoutMutation = useLogout({
-		onSuccess: () => {
-			toast.success('Đăng xuất thành công!');
-			navigate('/');
-		},
-		onError: () => {
-			toast.error('Đăng xuất thất bại!');
-		},
-	});
 
 	// Navigate page cart
 	const handleCartClick = () => {
@@ -54,15 +43,11 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 		navigate('/login');
 	};
 
-	// Handle logout
+	// Handle logout - sử dụng method từ AuthContext
 	const handleLogout = () => {
-		if (refreshToken) {
-			logoutMutation.mutate({ refreshToken });
-		} else {
-			// Nếu không có refresh token, chỉ clear local state
-			toast.success('Đăng xuất thành công!');
-			navigate('/');
-		}
+		logout(); // Sử dụng method từ AuthContext
+		toast.success('Đăng xuất thành công!');
+		navigate('/login');
 	};
 
 	// Tính tổng số lượng sản phẩm trong giỏ hàng
@@ -155,12 +140,9 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 							<DropdownMenuItem
 								className="cursor-pointer text-red-600 focus:text-red-600"
 								onClick={handleLogout}
-								disabled={logoutMutation.isPending}
 							>
 								<LogOut className="mr-2 h-4 w-4" />
-								<span>
-									{logoutMutation.isPending ? 'Đang đăng xuất...' : 'Đăng xuất'}
-								</span>
+								<span>Đăng xuất</span>
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

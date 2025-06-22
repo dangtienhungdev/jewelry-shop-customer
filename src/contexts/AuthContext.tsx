@@ -1,5 +1,6 @@
-import type { Customer } from '@/types/auth.type';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+
+import type { Customer } from '@/types/auth.type';
 
 interface AuthContextType {
 	isAuthenticated: boolean;
@@ -69,15 +70,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		initializeAuth();
 	}, []);
 
-	// Lắng nghe sự thay đổi localStorage từ các tab khác
+	// Lắng nghe sự thay đổi localStorage từ các tab khác hoặc từ component khác
 	useEffect(() => {
 		const handleStorageChange = (e: StorageEvent) => {
-			if (e.key === 'accessToken') {
-				if (e.newValue) {
-					setAccessToken(e.newValue);
-					setIsAuthenticated(true);
-				} else {
-					logout();
+			// Nếu accessToken bị xóa từ tab khác
+			if (e.key === 'accessToken' && !e.newValue) {
+				// Reset tất cả state
+				setAccessToken(null);
+				setRefreshToken(null);
+				setUser(null);
+				setIsAuthenticated(false);
+			}
+			// Nếu có accessToken mới từ tab khác
+			else if (e.key === 'accessToken' && e.newValue) {
+				setAccessToken(e.newValue);
+				setIsAuthenticated(true);
+
+				// Cập nhật user và refreshToken nếu có
+				const storedRefreshToken = localStorage.getItem('refreshToken');
+				const storedUser = localStorage.getItem('user');
+
+				if (storedRefreshToken) {
+					setRefreshToken(storedRefreshToken);
+				}
+
+				if (storedUser) {
+					try {
+						setUser(JSON.parse(storedUser));
+					} catch (error) {
+						console.error('Error parsing user from storage:', error);
+					}
 				}
 			}
 		};
@@ -85,6 +107,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		window.addEventListener('storage', handleStorageChange);
 		return () => window.removeEventListener('storage', handleStorageChange);
 	}, []);
+
+	// Kiểm tra định kỳ localStorage để đồng bộ state (cho trường hợp thay đổi trong cùng tab)
+	useEffect(() => {
+		const checkAuthState = () => {
+			const storedAccessToken = localStorage.getItem('accessToken');
+			const storedRefreshToken = localStorage.getItem('refreshToken');
+			const storedUser = localStorage.getItem('user');
+
+			// Nếu localStorage trống nhưng state vẫn có dữ liệu -> đăng xuất
+			if (!storedAccessToken && isAuthenticated) {
+				setAccessToken(null);
+				setRefreshToken(null);
+				setUser(null);
+				setIsAuthenticated(false);
+			}
+			// Nếu localStorage có dữ liệu nhưng state trống -> đăng nhập lại
+			else if (storedAccessToken && !isAuthenticated) {
+				setAccessToken(storedAccessToken);
+				setRefreshToken(storedRefreshToken);
+				setIsAuthenticated(true);
+
+				if (storedUser) {
+					try {
+						setUser(JSON.parse(storedUser));
+					} catch (error) {
+						console.error('Error parsing stored user:', error);
+					}
+				}
+			}
+		};
+
+		// Kiểm tra mỗi 1 giây
+		const interval = setInterval(checkAuthState, 1000);
+		return () => clearInterval(interval);
+	}, [isAuthenticated]);
 
 	const login = (tokens: {
 		accessToken: string;

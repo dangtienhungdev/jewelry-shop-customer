@@ -1,17 +1,18 @@
-import { createBrowserRouter } from 'react-router-dom';
-import PrivateRoute from './components/PrivateRoute';
-import ForgotPasswordPage from './pages/(auth)/forgot-password/page';
-import LoginPage from './pages/(auth)/login/page';
-import RegisterPage from './pages/(auth)/register/page';
-import ResetPasswordPage from './pages/(auth)/reset-password/page';
-import OrderHistoryPage from './pages/(user)/order-history/page';
-import UserInfoPage from './pages/(user)/user-info/page';
 import CartPage from './pages/cart/page';
+import ForgotPasswordPage from './pages/(auth)/forgot-password/page';
 import HomePage from './pages/home/page';
+import LoginPage from './pages/(auth)/login/page';
+import OrderHistoryPage from './pages/(user)/order-history/page';
 import PaymentPage from './pages/payment/page';
+import PrivateRoute from './components/PrivateRoute';
 import ProductDetailPage from './pages/product-detail/page';
 import ProductPage from './pages/products/page';
+import RegisterPage from './pages/(auth)/register/page';
+import ResetPasswordPage from './pages/(auth)/reset-password/page';
+import SystemPage from './pages/he-thong/page';
 import ThongTinPage from './pages/thong-tin/page';
+import UserInfoPage from './pages/(user)/user-info/page';
+import { createBrowserRouter } from 'react-router-dom';
 
 const routes = createBrowserRouter([
 	{
@@ -33,6 +34,10 @@ const routes = createBrowserRouter([
 	{
 		path: '/thong-tin',
 		element: <ThongTinPage />,
+	},
+	{
+		path: '/system',
+		element: <SystemPage />,
 	},
 	{
 		path: '/login',
