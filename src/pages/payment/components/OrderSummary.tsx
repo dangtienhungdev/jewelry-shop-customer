@@ -1,9 +1,13 @@
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+
+import { orderApi, type VoucherValidationResponse } from '@/apis/orders';
 import type { CheckoutData } from '@/contexts/CheckoutContext';
 import type { CartItem } from '@/types/cart.type';
-import React, { useState } from 'react';
 
 interface OrderSummaryProps {
 	checkoutData: CheckoutData;
+	shippingFee?: number; // Shipping fee from delivery info
 	onPayment?: (paymentData: {
 		items: CartItem[];
 		subtotal: number;
@@ -16,14 +20,17 @@ interface OrderSummaryProps {
 
 const OrderSummary: React.FC<OrderSummaryProps> = ({
 	checkoutData,
+	shippingFee = 30000,
 	onPayment,
 }) => {
 	const [discountCode, setDiscountCode] = useState('');
 	const [appliedDiscount, setAppliedDiscount] = useState(0);
+	const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
+	const [voucherValidation, setVoucherValidation] =
+		useState<VoucherValidationResponse | null>(null);
 
 	const { selectedItems, totalAmount } = checkoutData;
 	const subtotal = totalAmount;
-	const shippingFee = 20000;
 	const total = subtotal - appliedDiscount + shippingFee;
 
 	const formatPrice = (price: number): string => {
@@ -33,15 +40,60 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 		}).format(price);
 	};
 
-	const handleApplyDiscount = (e: React.FormEvent) => {
+	/**
+	 * Handle voucher validation using backend API
+	 */
+	const handleApplyDiscount = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (discountCode.toLowerCase() === 'sale10') {
-			setAppliedDiscount(subtotal * 0.1);
-		} else if (discountCode.toLowerCase() === 'welcome') {
-			setAppliedDiscount(50000);
-		} else {
-			alert('Mã giảm giá không hợp lệ');
+
+		if (!discountCode.trim()) {
+			toast.error('Vui lòng nhập mã voucher');
+			return;
 		}
+
+		setIsValidatingVoucher(true);
+
+		try {
+			const validationResult = await orderApi.validateVoucher({
+				voucherCode: discountCode.trim(),
+				orderValue: subtotal,
+			});
+
+			setVoucherValidation(validationResult);
+
+			if (validationResult.isValid) {
+				setAppliedDiscount(validationResult.discountAmount || 0);
+				toast.success('Áp dụng voucher thành công!', {
+					description: `Giảm ${formatPrice(
+						validationResult.discountAmount || 0
+					)}`,
+				});
+			} else {
+				setAppliedDiscount(0);
+				toast.error('Voucher không hợp lệ', {
+					description: validationResult.message,
+				});
+			}
+		} catch (error) {
+			console.error('Voucher validation error:', error);
+			setAppliedDiscount(0);
+			setVoucherValidation(null);
+			toast.error('Lỗi kiểm tra voucher', {
+				description: 'Vui lòng thử lại sau',
+			});
+		} finally {
+			setIsValidatingVoucher(false);
+		}
+	};
+
+	/**
+	 * Remove applied voucher
+	 */
+	const handleRemoveVoucher = () => {
+		setDiscountCode('');
+		setAppliedDiscount(0);
+		setVoucherValidation(null);
+		toast.info('Đã xóa voucher');
 	};
 
 	const handlePayment = () => {
@@ -51,7 +103,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 			discount: appliedDiscount,
 			shippingFee,
 			total,
-			discountCode: appliedDiscount > 0 ? discountCode : undefined,
+			discountCode: voucherValidation?.isValid ? discountCode : undefined,
 		};
 
 		if (onPayment) {
@@ -59,7 +111,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 		} else {
 			// Fallback behavior
 			console.log('Processing payment...', paymentData);
-			alert(`Thanh toán thành công!\nTổng tiền: ${formatPrice(total)}`);
+			toast.success(`Thanh toán thành công!\nTổng tiền: ${formatPrice(total)}`);
 		}
 	};
 
@@ -115,21 +167,73 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 			{/* Discount Code */}
 			<div className="bg-[#FAFAFA] border border-gray-200 rounded-md p-4">
 				<h3 className="font-semibold text-sm mb-3">Mã Giảm Giá</h3>
+
+				{/* Voucher input form */}
 				<form className="flex gap-2" onSubmit={handleApplyDiscount}>
 					<input
-						className="flex-1 border border-[#1B3B5B] rounded-md text-xs px-3 py-2 focus:outline-none focus:border-[#C28B1B] transition-colors"
+						className="flex-1 border border-[#1B3B5B] rounded-md text-xs px-3 py-2 focus:outline-none focus:border-[#C28B1B] transition-colors disabled:bg-gray-100"
 						placeholder="Nhập mã giảm giá"
 						type="text"
 						value={discountCode}
 						onChange={(e) => setDiscountCode(e.target.value)}
+						disabled={isValidatingVoucher}
 					/>
 					<button
-						className="bg-[#C28B1B] text-white text-xs font-semibold px-4 rounded-md hover:bg-[#a67a16] transition-colors"
+						className="bg-[#C28B1B] text-white text-xs font-semibold px-4 rounded-md hover:bg-[#a67a16] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
 						type="submit"
+						disabled={isValidatingVoucher || !discountCode.trim()}
 					>
-						ÁP DỤNG
+						{isValidatingVoucher ? (
+							<>
+								<i className="fas fa-spinner fa-spin mr-1"></i>
+								KIỂM TRA
+							</>
+						) : (
+							'ÁP DỤNG'
+						)}
 					</button>
 				</form>
+
+				{/* Voucher status */}
+				{voucherValidation && (
+					<div
+						className={`mt-2 p-2 rounded text-xs ${
+							voucherValidation.isValid
+								? 'bg-green-50 border border-green-200 text-green-700'
+								: 'bg-red-50 border border-red-200 text-red-700'
+						}`}
+					>
+						<div className="flex items-center justify-between">
+							<span>
+								<i
+									className={`fas ${
+										voucherValidation.isValid
+											? 'fa-check-circle'
+											: 'fa-exclamation-circle'
+									} mr-1`}
+								></i>
+								{voucherValidation.message}
+							</span>
+							{voucherValidation.isValid && (
+								<button
+									onClick={handleRemoveVoucher}
+									className="text-red-600 hover:text-red-800"
+									title="Xóa voucher"
+								>
+									<i className="fas fa-times"></i>
+								</button>
+							)}
+						</div>
+						{voucherValidation.isValid && voucherValidation.voucher && (
+							<div className="mt-1 text-[10px] text-gray-600">
+								{voucherValidation.voucher.discountName} -
+								{voucherValidation.voucher.discountType === 'percentage'
+									? ` ${voucherValidation.voucher.discountValue}%`
+									: ` ${formatPrice(voucherValidation.voucher.discountValue)}`}
+							</div>
+						)}
+					</div>
+				)}
 
 				{/* Price Summary */}
 				<div className="mt-4 text-xs text-black">
@@ -161,21 +265,32 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 					Vui lòng kiểm tra Sản phẩm & Mã giảm giá trước khi thanh toán
 				</p>
 
-				{/* Discount Hints */}
-				{appliedDiscount === 0 && (
+				{/* Discount Hints - only show if no voucher applied */}
+				{appliedDiscount === 0 && !voucherValidation && (
 					<div className="mt-2 text-[10px] text-gray-500 bg-blue-50 border border-blue-200 rounded p-2">
 						<i className="fas fa-info-circle text-blue-500 mr-1"></i>
-						Thử mã: <span className="font-semibold">SALE10</span> hoặc{' '}
-						<span className="font-semibold">WELCOME</span>
+						Thử các mã giảm giá phổ biến:
+						<div className="mt-1 flex flex-wrap gap-1">
+							{['WELCOME10', 'SALE500K', 'VIP15', 'NEWCUSTOMER'].map((code) => (
+								<button
+									key={code}
+									onClick={() => setDiscountCode(code)}
+									className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[9px] hover:bg-blue-200 transition-colors"
+								>
+									{code}
+								</button>
+							))}
+						</div>
 					</div>
 				)}
 			</div>
 
 			{/* Payment Button */}
 			<button
-				className="bg-[#C28B1B] text-white font-semibold text-sm rounded-md py-3 hover:bg-[#a67a16] transition-colors shadow-md"
+				className="bg-[#C28B1B] text-white font-semibold text-sm rounded-md py-3 hover:bg-[#a67a16] transition-colors shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed"
 				type="button"
 				onClick={handlePayment}
+				disabled={selectedItems.length === 0}
 			>
 				Thanh Toán - {formatPrice(total)}
 			</button>

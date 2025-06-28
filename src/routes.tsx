@@ -3,7 +3,9 @@ import ForgotPasswordPage from './pages/(auth)/forgot-password/page';
 import HomePage from './pages/home/page';
 import LoginPage from './pages/(auth)/login/page';
 import OrderHistoryPage from './pages/(user)/order-history/page';
+import PaymentCancelPage from './pages/payment/cancel/page';
 import PaymentPage from './pages/payment/page';
+import PaymentSuccessPage from './pages/payment/success/page';
 import PrivateRoute from './components/PrivateRoute';
 import ProductDetailPage from './pages/product-detail/page';
 import ProductPage from './pages/products/page';
@@ -61,6 +63,22 @@ const routes = createBrowserRouter([
 		element: (
 			<PrivateRoute>
 				<PaymentPage />
+			</PrivateRoute>
+		),
+	},
+	{
+		path: '/payment/cancel',
+		element: (
+			<PrivateRoute>
+				<PaymentCancelPage />
+			</PrivateRoute>
+		),
+	},
+	{
+		path: '/payment/success',
+		element: (
+			<PrivateRoute>
+				<PaymentSuccessPage />
 			</PrivateRoute>
 		),
 	},

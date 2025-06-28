@@ -1,4 +1,5 @@
-import { Button } from '@/components/ui/button';
+import * as z from 'zod';
+
 import {
 	Form,
 	FormControl,
@@ -7,15 +8,16 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
+import type { PaymentMethod, ShippingMethod } from '@/types/payment.type';
+import React, { useEffect, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
-import type { PaymentMethod, ShippingMethod } from '@/types/payment.type';
-import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 // Zod schema for delivery form
 const deliveryFormSchema = z.object({
@@ -38,10 +40,27 @@ const deliveryFormSchema = z.object({
 
 type DeliveryFormValues = z.infer<typeof deliveryFormSchema>;
 
-const DeliveryInfo: React.FC = () => {
+// Props interface to receive delivery info from parent
+interface DeliveryInfoProps {
+	onDeliveryInfoChange?: (deliveryInfo: {
+		recipientName: string;
+		phone: string;
+		address: string;
+		orderNote?: string;
+		shippingMethod: string;
+		paymentMethod: 'cash' | 'payos';
+		shippingFee: number;
+	}) => void;
+}
+
+const DeliveryInfo: React.FC<DeliveryInfoProps> = ({
+	onDeliveryInfoChange,
+}) => {
 	const { user, isAuthenticated } = useAuth();
-	const [selectedShipping, setSelectedShipping] = useState<string>('fast');
-	const [selectedPayment, setSelectedPayment] = useState<string>('cash');
+	const [selectedShipping, setSelectedShipping] = useState<string>('standard');
+	const [selectedPayment, setSelectedPayment] = useState<'cash' | 'payos'>(
+		'cash'
+	);
 
 	// Form setup
 	const form = useForm<DeliveryFormValues>({
@@ -66,36 +85,34 @@ const DeliveryInfo: React.FC = () => {
 		}
 	}, [user, isAuthenticated, form]);
 
-	// Mock data
+	// Shipping methods - updated to match backend expectations
 	const shippingMethods: ShippingMethod[] = [
-		{
-			id: 'fast',
-			name: 'Nhanh',
-			duration: '20 phút',
-			price: 20000,
-		},
 		{
 			id: 'standard',
 			name: 'Tiêu chuẩn',
-			duration: '40 phút',
-			price: 11000,
+			duration: '3-5 ngày',
+			price: 30000, // Default shipping fee from backend
+		},
+		{
+			id: 'fast',
+			name: 'Nhanh',
+			duration: '1-2 ngày',
+			price: 50000,
 		},
 	];
 
+	// Payment methods - updated to match backend API (cash/payos)
 	const paymentMethods: PaymentMethod[] = [
 		{
 			id: 'cash',
-			name: 'Thanh toán tiền mặt',
+			name: 'Thanh toán khi nhận hàng (COD)',
+			description: 'Thanh toán bằng tiền mặt khi nhận hàng',
 		},
 		{
-			id: 'momo',
-			name: 'Ví MoMo hoặc chuyển khoản ngân hàng',
-			icon: 'https://storage.googleapis.com/a1aa/image/bc155505-d0db-4976-19be-51589260d3a7.jpg',
-		},
-		{
-			id: 'vnpay',
-			name: 'Thanh toán quét mã QR',
-			icon: 'https://storage.googleapis.com/a1aa/image/0a4b2d56-2227-4557-d8ef-e96ee7003c18.jpg',
+			id: 'payos',
+			name: 'Thanh toán trực tuyến PayOS',
+			description: 'Chuyển khoản ngân hàng qua PayOS',
+			icon: 'https://pay.payos.vn/assets/images/logo.png',
 		},
 	];
 
@@ -106,11 +123,38 @@ const DeliveryInfo: React.FC = () => {
 		}).format(price);
 	};
 
+	// Get selected shipping fee
+	const getShippingFee = (): number => {
+		const selectedMethod = shippingMethods.find(
+			(method) => method.id === selectedShipping
+		);
+		return selectedMethod?.price || 30000;
+	};
+
+	// Watch form changes and notify parent
+	const watchedValues = form.watch();
+	useEffect(() => {
+		const { recipientName, phone, address, orderNote } = watchedValues;
+
+		// Only notify if form has required values
+		if (recipientName && phone && address && onDeliveryInfoChange) {
+			onDeliveryInfoChange({
+				recipientName,
+				phone,
+				address,
+				orderNote,
+				shippingMethod: selectedShipping,
+				paymentMethod: selectedPayment,
+				shippingFee: getShippingFee(),
+			});
+		}
+	}, [watchedValues, selectedShipping, selectedPayment, onDeliveryInfoChange]);
+
 	const onSubmit = (values: DeliveryFormValues) => {
 		console.log('Delivery form values:', values);
 		console.log('Selected shipping:', selectedShipping);
 		console.log('Selected payment:', selectedPayment);
-		// Handle form submission here
+		// Form validation passed - data is already being passed to parent via useEffect
 	};
 
 	// Loading state when user data is not available
@@ -198,7 +242,7 @@ const DeliveryInfo: React.FC = () => {
 									</div>
 									<FormControl>
 										<Input
-											placeholder="Nhập địa chỉ giao hàng"
+											placeholder="Nhập địa chỉ giao hàng đầy đủ"
 											className="flex-1 py-3 px-4 text-sm border-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-r-md shadow-none"
 											{...field}
 										/>
@@ -236,9 +280,9 @@ const DeliveryInfo: React.FC = () => {
 								</FormLabel>
 								<FormControl>
 									<Textarea
-										placeholder="Nhập ghi chú cho đơn hàng (tùy chọn)"
+										placeholder="Nhập ghi chú cho đơn hàng (tùy chọn). VD: Giao hàng buổi chiều, gọi trước khi đến..."
 										className="resize-none text-sm focus-visible:ring-1 focus-visible:ring-[#C28B1B] focus-visible:border-[#C28B1B]"
-										rows={4}
+										rows={3}
 										{...field}
 									/>
 								</FormControl>
@@ -276,7 +320,7 @@ const DeliveryInfo: React.FC = () => {
 										</span>
 										<i
 											className="fas fa-info-circle text-[10px]"
-											title="Thông tin"
+											title="Phí vận chuyển"
 										></i>
 									</div>
 								</button>
@@ -294,7 +338,9 @@ const DeliveryInfo: React.FC = () => {
 								<button
 									key={method.id}
 									type="button"
-									onClick={() => setSelectedPayment(method.id)}
+									onClick={() =>
+										setSelectedPayment(method.id as 'cash' | 'payos')
+									}
 									className={`flex items-center gap-3 border rounded-md text-xs font-semibold px-4 py-3 w-full text-left transition-colors ${
 										selectedPayment === method.id
 											? 'border-[#C28B1B] bg-[#C28B1B] text-white'
@@ -312,12 +358,27 @@ const DeliveryInfo: React.FC = () => {
 											}}
 										/>
 									)}
-									<span>{method.name}</span>
+									<div className="flex-1">
+										<div>{method.name}</div>
+										{method.description && (
+											<div className="text-[10px] opacity-80 mt-1">
+												{method.description}
+											</div>
+										)}
+									</div>
 									{selectedPayment === method.id && (
 										<i className="fas fa-check ml-auto text-sm"></i>
 									)}
 								</button>
 							))}
+						</div>
+
+						{/* Payment method info */}
+						<div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
+							<i className="fas fa-info-circle mr-1"></i>
+							{selectedPayment === 'cash'
+								? 'Thanh toán bằng tiền mặt khi nhận hàng. Shipper sẽ mang POS nếu bạn muốn thanh toán bằng thẻ.'
+								: 'Thanh toán trực tuyến an toàn qua PayOS. Hỗ trợ chuyển khoản ngân hàng và ví điện tử.'}
 						</div>
 					</div>
 
@@ -337,6 +398,20 @@ const DeliveryInfo: React.FC = () => {
 								<strong>Thành viên từ:</strong>{' '}
 								{new Date(user.createdAt).toLocaleDateString('vi-VN')}
 							</p>
+						</div>
+					</div>
+
+					{/* Form validation summary */}
+					<div className="bg-gray-50 border border-gray-200 rounded-md p-3">
+						<div className="flex items-center gap-2 mb-2">
+							<i className="fas fa-clipboard-check text-gray-500 text-sm"></i>
+							<span className="text-sm font-medium text-gray-700">
+								Kiểm tra thông tin
+							</span>
+						</div>
+						<div className="text-xs text-gray-600">
+							Vui lòng kiểm tra kỹ thông tin giao hàng trước khi đặt hàng. Thông
+							tin này sẽ được sử dụng để liên hệ và giao hàng.
 						</div>
 					</div>
 				</form>

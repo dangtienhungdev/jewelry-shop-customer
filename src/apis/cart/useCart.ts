@@ -1,4 +1,3 @@
-import { useAuth } from '@/contexts/AuthContext';
 import type {
 	AddToCartPayload,
 	Cart,
@@ -10,8 +9,10 @@ import type {
 	UseQueryOptions,
 } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+
 import { cartApi } from './cart.api';
+import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Query keys for React Query
 export const cartKeys = {
@@ -138,7 +139,7 @@ export const useRemoveFromCart = (
 
 // Hook để xóa toàn bộ giỏ hàng
 export const useClearCart = (
-	options?: UseMutationOptions<null, Error, void>
+	options?: UseMutationOptions<{ message: string }, Error, void>
 ) => {
 	const queryClient = useQueryClient();
 	const { user } = useAuth();
@@ -149,12 +150,17 @@ export const useClearCart = (
 			const response = await cartApi.clearCart(user._id);
 			return response.data;
 		},
-		onSuccess: () => {
+		onSuccess: (data) => {
 			// Xóa cache giỏ hàng
 			if (user?._id) {
 				queryClient.removeQueries({ queryKey: cartKeys.byCustomer(user._id) });
 			}
-			toast.success('Đã xóa toàn bộ giỏ hàng!');
+			// Only show toast if no custom onSuccess provided
+			if (!options?.onSuccess) {
+				toast.success('Đã xóa toàn bộ giỏ hàng!');
+			}
+			// Call custom onSuccess if provided
+			options?.onSuccess?.(data, undefined as any, undefined as any);
 		},
 		onError: (error: any) => {
 			const errorMessage =

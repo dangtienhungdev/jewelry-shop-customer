@@ -1,5 +1,6 @@
-import { api } from '@/configs';
 import type { AddToCartPayload, Cart } from '@/types/cart.type';
+
+import { api } from '@/configs';
 
 // Cart API endpoints
 export const cartApi = {
@@ -25,8 +26,10 @@ export const cartApi = {
 		return api.delete<Cart>(`/cart/customer/${customerId}/items/${productId}`);
 	},
 
-	// DELETE /cart/customer/{customerId} - Xóa toàn bộ giỏ hàng
+	// DELETE /cart/customer/{customerId}/clear - Xóa toàn bộ giỏ hàng
 	clearCart: (customerId: string) => {
-		return api.delete<null>(`/cart/customer/${customerId}`);
+		return api.delete<{ message: string }>(
+			`/cart/customer/${customerId}/clear`
+		);
 	},
 };

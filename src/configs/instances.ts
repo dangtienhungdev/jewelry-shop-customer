@@ -4,6 +4,7 @@ import type {
 	AxiosResponse,
 	InternalAxiosRequestConfig,
 } from 'axios';
+
 import axios from 'axios';
 
 // Base configuration
