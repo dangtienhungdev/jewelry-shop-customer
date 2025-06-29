@@ -1,11 +1,12 @@
-import { useProduct } from '@/apis';
 import { MainLayout } from '@/layouts';
-import React from 'react';
-import { useParams } from 'react-router-dom';
 import ProductDetailBreadcrumb from './components/ProductDetailBreadcrumb';
 import ProductDetailInfo from './components/ProductDetailInfo';
 import ProductGallery from './components/ProductGallery';
+import React from 'react';
 import RelatedProducts from './components/RelatedProducts';
+import { Reviews } from './components/reviews';
+import { useParams } from 'react-router-dom';
+import { useProduct } from '@/apis';
 
 const ProductDetailPage: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
@@ -87,6 +88,16 @@ const ProductDetailPage: React.FC = () => {
 					<ProductDetailInfo product={product} />
 				</section>
 				<RelatedProducts />
+
+				{/* Reviews Section */}
+				<section className="mt-16">
+					<div className="max-w-7xl mx-auto px-6">
+						<h2 className="text-2xl font-bold text-gray-900 mb-8">
+							Đánh giá sản phẩm
+						</h2>
+						<Reviews productId={product.id} />
+					</div>
+				</section>
 			</div>
 		</MainLayout>
 	);
