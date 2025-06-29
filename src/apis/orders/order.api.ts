@@ -41,6 +41,11 @@ export interface OrderResponseDto {
 	notes?: string;
 }
 
+export interface CustomerOrdersResponse {
+	orders: OrderResponseDto[];
+	total: number;
+}
+
 export interface CreateOrderResponse {
 	order: OrderResponseDto;
 	paymentUrl?: string;
@@ -154,9 +159,13 @@ export const orderApi = {
 	/**
 	 * Lấy danh sách đơn hàng của customer
 	 */
-	async getCustomerOrders(customerId: string, page = 1, limit = 10) {
+	async getCustomerOrders(
+		customerId: string,
+		page = 1,
+		limit = 10
+	): Promise<CustomerOrdersResponse> {
 		try {
-			const response = await api.get(
+			const response = await api.get<CustomerOrdersResponse>(
 				`/orders?customerId=${customerId}&page=${page}&limit=${limit}`
 			);
 			return response.data;
