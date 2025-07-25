@@ -1,6 +1,5 @@
 import * as z from 'zod';
 
-import { useChangePassword, useUpdateProfile } from '@/apis/auth';
 import {
 	Form,
 	FormControl,
@@ -9,17 +8,18 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Key, Lock, Save, User } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useChangePassword, useUpdateProfile } from '@/apis/auth';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/contexts/AuthContext';
 import { MainLayout } from '@/layouts';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 // Zod schema for profile update
 const updateProfileSchema = z.object({
