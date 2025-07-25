@@ -1,5 +1,6 @@
+import * as z from 'zod';
+
 import { useChangePassword, useUpdateProfile } from '@/apis/auth';
-import { Button } from '@/components/ui/button';
 import {
 	Form,
 	FormControl,
@@ -8,16 +9,17 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Key, Lock, Save, User } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { MainLayout } from '@/layouts';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Key, Lock, Save, User } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import * as z from 'zod';
 
 // Zod schema for profile update
 const updateProfileSchema = z.object({
@@ -85,7 +87,7 @@ const UserInfoPage = () => {
 	useEffect(() => {
 		if (user) {
 			profileForm.reset({
-				fullName: user.fullName || '',
+				fullName: user?.fullName || '',
 				phone: user.phone || '',
 				address: user.address || '',
 			});
@@ -163,7 +165,7 @@ const UserInfoPage = () => {
 						</div>
 						<div>
 							<h2 className="text-xl font-medium text-gray-900">
-								{user.fullName}
+								{user?.fullName}
 							</h2>
 							<p className="text-gray-600">{user.email}</p>
 							<p className="text-sm text-gray-500">

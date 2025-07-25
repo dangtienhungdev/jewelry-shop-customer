@@ -16,8 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
 // Zod schema for delivery form
 const deliveryFormSchema = z.object({
@@ -77,7 +77,7 @@ const DeliveryInfo: React.FC<DeliveryInfoProps> = ({
 	useEffect(() => {
 		if (user && isAuthenticated) {
 			form.reset({
-				recipientName: user.fullName || '',
+				recipientName: user?.fullName || '',
 				phone: user.phone || '',
 				address: user.address || '',
 				orderNote: '',
