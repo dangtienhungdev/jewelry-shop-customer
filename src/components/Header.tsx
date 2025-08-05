@@ -6,7 +6,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Link, useNavigate } from 'react-router-dom';
 import {
 	LogOut,
 	Menu,
@@ -18,14 +17,15 @@ import {
 	X,
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import type { Product } from '@/types/product.type';
-import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/apis/cart';
 import { useSearchProducts } from '@/apis/products';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/contexts/AuthContext';
+import type { Product } from '@/types/product.type';
+import { toast } from 'sonner';
 
 interface HeaderProps {
 	className?: string;
@@ -305,7 +305,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 							<DropdownMenuLabel className="font-normal">
 								<div className="flex flex-col space-y-1">
 									<p className="text-sm font-medium leading-none">
-										{user??.fullName || 'Người dùng'}
+										{user?.fullName || 'Người dùng'}
 									</p>
 									<p className="text-xs leading-none text-muted-foreground">
 										{user?.email}
