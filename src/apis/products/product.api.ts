@@ -1,4 +1,3 @@
-import { api } from '@/configs';
 import type { ApiResponse, PaginatedApiResponse } from '@/types/api.type';
 import type {
 	CreateProductPayload,
@@ -6,6 +5,8 @@ import type {
 	ProductQueryParams,
 	UpdateProductPayload,
 } from '@/types/product.type';
+
+import { api } from '@/configs';
 
 // Products API endpoints
 export const productApi = {
@@ -54,6 +55,15 @@ export const productApi = {
 	) => {
 		return api.get<PaginatedApiResponse<Product>>('/products/search', {
 			params,
+		});
+	},
+
+	// GET /products/:id/related - Lấy sản phẩm liên quan
+	getRelatedProducts: (id: string, limit?: number) => {
+		return api.get<
+			ApiResponse<{ items: Product[]; total: number; limit: number }>
+		>(`/products/${id}/related`, {
+			params: { limit },
 		});
 	},
 };

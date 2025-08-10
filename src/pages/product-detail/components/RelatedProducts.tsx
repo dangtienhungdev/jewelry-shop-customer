@@ -1,70 +1,30 @@
-import type { RelatedProduct } from '@/types/productDetail.type';
+import { useNavigate, useParams } from 'react-router-dom';
+
+import { useRelatedProducts } from '@/apis/products';
 import React from 'react';
 
-const RelatedProducts: React.FC = () => {
-	// Mock data
-	const relatedProducts: RelatedProduct[] = [
-		{
-			id: '2',
-			name: 'R MIDI BIG 6MM GEM',
-			price: 1399000,
-			originalPrice: 1599000,
-			discountPercentage: 13,
-			image:
-				'https://storage.googleapis.com/a1aa/image/cbae6a4e-dc18-4a66-4ffe-11a5e4f314c5.jpg',
-			rating: 4.5,
-			category: 'Nhẫn',
-		},
-		{
-			id: '3',
-			name: 'BRA MULTI ROSE',
-			price: 990000,
-			image:
-				'https://storage.googleapis.com/a1aa/image/681e5adf-fe2f-4e76-d9c2-58a2791a8080.jpg',
-			rating: 4.8,
-			category: 'Lắc tay',
-		},
-		{
-			id: '4',
-			name: 'BRA MULTI TWIST BOW',
-			price: 890000,
-			originalPrice: 1090000,
-			discountPercentage: 18,
-			image:
-				'https://storage.googleapis.com/a1aa/image/bfd5e730-456c-4baa-cc91-ea3e356a09ce.jpg',
-			rating: 4.3,
-			category: 'Lắc tay',
-		},
-		{
-			id: '5',
-			name: 'EARRINGS LEAF DESIGN',
-			price: 590000,
-			image:
-				'https://storage.googleapis.com/a1aa/image/202e1a86-96a2-4277-0ed4-bbc01233a063.jpg',
-			rating: 4.6,
-			category: 'Bông tai',
-		},
-		{
-			id: '6',
-			name: 'RING BUTTERFLY',
-			price: 990000,
-			image:
-				'https://storage.googleapis.com/a1aa/image/b5f06c7c-56b8-4294-cedd-bdc4fadbb6a1.jpg',
-			rating: 4.7,
-			category: 'Nhẫn',
-		},
-		{
-			id: '7',
-			name: 'EARRINGS PEARL FLOWER',
-			price: 890000,
-			originalPrice: 990000,
-			discountPercentage: 10,
-			image:
-				'https://storage.googleapis.com/a1aa/image/b658d9ec-bb59-4870-db31-3e39e1d820f6.jpg',
-			rating: 4.4,
-			category: 'Bông tai',
-		},
-	];
+interface RelatedProductsProps {
+	productId?: string;
+	limit?: number;
+}
+
+const RelatedProducts: React.FC<RelatedProductsProps> = ({
+	productId: propProductId,
+	limit = 8,
+}) => {
+	const navigate = useNavigate();
+	const { id: urlProductId } = useParams<{ id: string }>();
+
+	// Sử dụng productId từ props hoặc từ URL params
+	const currentProductId = propProductId || urlProductId;
+
+	const {
+		data: relatedData,
+		isLoading,
+		error,
+	} = useRelatedProducts(currentProductId || '', limit);
+
+	const relatedProducts = relatedData?.data?.items || [];
 
 	const formatPrice = (price: number): string => {
 		return new Intl.NumberFormat('vi-VN', {
@@ -85,10 +45,90 @@ const RelatedProducts: React.FC = () => {
 	};
 
 	const handleProductClick = (productId: string) => {
-		// Điều hướng đến trang chi tiết sản phẩm khác
-		console.log('Navigate to product:', productId);
-		// navigate(`/product-detail/${productId}`);
+		navigate(`/product-detail/${productId}`);
 	};
+
+	const handleViewMore = () => {
+		// Điều hướng đến trang products với filter theo category
+		if (
+			relatedProducts.length > 0 &&
+			relatedProducts[0].category?.categoryName
+		) {
+			navigate(
+				`/products?category=${relatedProducts[0].category.categoryName}`
+			);
+		} else {
+			navigate('/products');
+		}
+	};
+
+	// Loading state
+	if (isLoading) {
+		return (
+			<section className="bg-white">
+				<div className="border-t border-gray-200 pt-8">
+					<h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+						<span className="border-l-4 border-[#C28B1B] pl-3 mr-2">
+							Sản phẩm liên quan
+						</span>
+					</h2>
+					<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+						{Array.from({ length: 6 }).map((_, index) => (
+							<div
+								key={index}
+								className="bg-white border border-gray-200 rounded-md p-3"
+							>
+								<div className="animate-pulse">
+									<div className="bg-gray-200 h-40 rounded-md mb-3"></div>
+									<div className="space-y-2">
+										<div className="bg-gray-200 h-4 rounded"></div>
+										<div className="bg-gray-200 h-6 rounded"></div>
+										<div className="bg-gray-200 h-4 rounded w-2/3"></div>
+									</div>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+		);
+	}
+
+	// Error state
+	if (error) {
+		return (
+			<section className="bg-white">
+				<div className="border-t border-gray-200 pt-8">
+					<h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+						<span className="border-l-4 border-[#C28B1B] pl-3 mr-2">
+							Sản phẩm liên quan
+						</span>
+					</h2>
+					<div className="text-center py-8">
+						<p className="text-gray-500">Không thể tải sản phẩm liên quan</p>
+					</div>
+				</div>
+			</section>
+		);
+	}
+
+	// Empty state
+	if (relatedProducts.length === 0) {
+		return (
+			<section className="bg-white">
+				<div className="border-t border-gray-200 pt-8">
+					<h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+						<span className="border-l-4 border-[#C28B1B] pl-3 mr-2">
+							Sản phẩm liên quan
+						</span>
+					</h2>
+					<div className="text-center py-8">
+						<p className="text-gray-500">Không có sản phẩm liên quan</p>
+					</div>
+				</div>
+			</section>
+		);
+	}
 
 	return (
 		<section className="bg-white">
@@ -110,13 +150,12 @@ const RelatedProducts: React.FC = () => {
 							{/* Product Image */}
 							<div className="relative overflow-hidden rounded-md mb-3">
 								<img
-									alt={product.name}
+									alt={product.productName}
 									className="w-full h-40 object-contain group-hover:scale-105 transition-transform duration-300"
-									src={product.image}
+									src={product.images?.[0] || '/placeholder-product.jpg'}
 									onError={(e) => {
 										const target = e.target as HTMLImageElement;
-										target.src =
-											'https://via.placeholder.com/160x160?text=No+Image';
+										target.src = '/placeholder-product.jpg';
 									}}
 								/>
 								{product.discountPercentage &&
@@ -137,38 +176,26 @@ const RelatedProducts: React.FC = () => {
 							<div>
 								{/* Category */}
 								<div className="text-xs text-gray-500 mb-1">
-									{product.category}
+									{product.category?.categoryName || 'Không phân loại'}
 								</div>
 
 								{/* Product Name */}
 								<h3
 									className="text-sm font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#C28B1B] transition-colors"
-									title={product.name}
+									title={product.productName}
 								>
-									{product.name}
+									{product.productName}
 								</h3>
-
-								{/* Rating */}
-								{product.rating && (
-									<div className="flex items-center space-x-1 mb-2">
-										<div className="flex space-x-1">
-											{renderStars(product.rating)}
-										</div>
-										<span className="text-xs text-gray-600">
-											({product.rating})
-										</span>
-									</div>
-								)}
 
 								{/* Price */}
 								<div className="space-y-1">
 									<div className="text-sm font-bold text-[#C28B1B]">
-										{formatPrice(product.price)}
+										{formatPrice(product.effectivePrice)}
 									</div>
-									{product.originalPrice &&
-										product.originalPrice > product.price && (
+									{product.discountedPrice &&
+										product.discountedPrice < product.price && (
 											<div className="text-xs text-gray-500 line-through">
-												{formatPrice(product.originalPrice)}
+												{formatPrice(product.price)}
 											</div>
 										)}
 								</div>
@@ -178,7 +205,7 @@ const RelatedProducts: React.FC = () => {
 									onClick={(e) => {
 										e.stopPropagation();
 										console.log('Add to cart:', product.id);
-										alert(`Đã thêm ${product.name} vào giỏ hàng!`);
+										// TODO: Implement add to cart functionality
 									}}
 									className="w-full mt-3 bg-[#C28B1B] text-white text-xs font-semibold py-2 px-3 rounded-md hover:bg-[#a67a16] transition-colors opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300"
 								>
@@ -191,19 +218,17 @@ const RelatedProducts: React.FC = () => {
 				</div>
 
 				{/* View More Button */}
-				<div className="text-center mt-8">
-					<button
-						onClick={() => {
-							// Điều hướng đến trang products với filter
-							console.log('View more related products');
-							// navigate('/products?category=nhan');
-						}}
-						className="bg-gray-200 text-gray-800 font-semibold px-8 py-3 rounded-md hover:bg-gray-300 transition-colors"
-					>
-						Xem thêm sản phẩm liên quan
-						<i className="fas fa-arrow-right ml-2"></i>
-					</button>
-				</div>
+				{/* {relatedProducts.length > 0 && (
+					<div className="text-center mt-8">
+						<button
+							onClick={handleViewMore}
+							className="bg-gray-200 text-gray-800 font-semibold px-8 py-3 rounded-md hover:bg-gray-300 transition-colors"
+						>
+							Xem thêm sản phẩm liên quan
+							<i className="fas fa-arrow-right ml-2"></i>
+						</button>
+					</div>
+				)} */}
 			</div>
 		</section>
 	);

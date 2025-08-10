@@ -10,6 +10,7 @@ import type {
 	UseQueryOptions,
 } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import { productApi } from './product.api';
 
 // Query keys for React Query
@@ -23,6 +24,8 @@ export const productKeys = {
 	featured: () => [...productKeys.all, 'featured'] as const,
 	search: (params: Pick<ProductQueryParams, 'search' | 'page' | 'limit'>) =>
 		[...productKeys.all, 'search', params] as const,
+	related: (id: string, limit?: number) =>
+		[...productKeys.all, 'related', id, limit] as const,
 };
 
 // Hook để lấy danh sách sản phẩm
@@ -84,6 +87,26 @@ export const useSearchProducts = (
 		},
 		enabled: !!params.search,
 		staleTime: 2 * 60 * 1000, // 2 minutes
+		...options,
+	});
+};
+
+// Hook để lấy sản phẩm liên quan
+export const useRelatedProducts = (
+	id: string,
+	limit?: number,
+	options?: UseQueryOptions<
+		ApiResponse<{ items: Product[]; total: number; limit: number }>
+	>
+) => {
+	return useQuery({
+		queryKey: productKeys.related(id, limit),
+		queryFn: async () => {
+			const response = await productApi.getRelatedProducts(id, limit);
+			return response.data;
+		},
+		enabled: !!id,
+		staleTime: 5 * 60 * 1000, // 5 minutes
 		...options,
 	});
 };

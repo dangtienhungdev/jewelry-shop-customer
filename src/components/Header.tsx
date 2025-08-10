@@ -129,7 +129,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 		>
 			<div className="text-sm font-normal">
 				<Link to="/" className="hover:text-gray-900 transition-colors">
-					Logo
+					Fayra
 				</Link>
 			</div>
 

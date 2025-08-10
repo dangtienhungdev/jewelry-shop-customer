@@ -10,6 +10,8 @@ const orderKeys = {
 		[...orderKeys.lists(), customerId, page, limit] as const,
 	details: () => [...orderKeys.all, 'detail'] as const,
 	detail: (orderId: string) => [...orderKeys.details(), orderId] as const,
+	vouchers: () => [...orderKeys.all, 'vouchers'] as const,
+	activeVouchers: () => [...orderKeys.all, 'active-vouchers'] as const,
 };
 
 // Hook để lấy danh sách đơn hàng
@@ -34,6 +36,16 @@ export const useOrderDetail = (orderId: string) => {
 		queryFn: () => orderApi.getOrderById(orderId),
 		enabled: !!orderId,
 		staleTime: 5 * 60 * 1000, // 5 minutes
+	});
+};
+
+// Hook để lấy danh sách voucher đang hoạt động
+export const useActiveVouchers = () => {
+	return useQuery({
+		queryKey: orderKeys.activeVouchers(),
+		queryFn: () => orderApi.getActiveVouchers(),
+		staleTime: 10 * 60 * 1000, // 10 minutes
+		gcTime: 15 * 60 * 1000, // 15 minutes
 	});
 };
 

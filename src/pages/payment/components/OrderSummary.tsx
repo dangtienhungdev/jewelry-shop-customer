@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
-import { orderApi, type VoucherValidationResponse } from '@/apis/orders';
+import {
+	orderApi,
+	useActiveVouchers,
+	type VoucherValidationResponse,
+} from '@/apis/orders';
 import type { CheckoutData } from '@/contexts/CheckoutContext';
 import type { CartItem } from '@/types/cart.type';
 
@@ -28,6 +32,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 	const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
 	const [voucherValidation, setVoucherValidation] =
 		useState<VoucherValidationResponse | null>(null);
+	const [showVoucherList, setShowVoucherList] = useState(false);
+
+	// Lấy danh sách voucher đang hoạt động
+	const { data: activeVouchersData, isLoading: isLoadingVouchers } =
+		useActiveVouchers();
+	const activeVouchers = activeVouchersData?.vouchers || [];
 
 	const { selectedItems, totalAmount } = checkoutData;
 	const subtotal = totalAmount;
@@ -38,6 +48,58 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 			style: 'currency',
 			currency: 'VND',
 		}).format(price);
+	};
+
+	/**
+	 * Lọc voucher phù hợp với giá trị đơn hàng
+	 */
+	const getAvailableVouchers = () => {
+		return activeVouchers.filter((voucher) => {
+			// Kiểm tra giá trị đơn hàng tối thiểu
+			if (subtotal < voucher.minOrderValue) {
+				return false;
+			}
+
+			// Kiểm tra giới hạn sử dụng
+			if (voucher.usageLimit && voucher.usedCount >= voucher.usageLimit) {
+				return false;
+			}
+
+			// Kiểm tra ngày hiệu lực
+			const now = new Date();
+			const startDate = new Date(voucher.startDate);
+			const endDate = new Date(voucher.endDate);
+
+			return now >= startDate && now <= endDate;
+		});
+	};
+
+	/**
+	 * Tính toán giá trị giảm giá của voucher
+	 */
+	const calculateVoucherDiscount = (voucher: any) => {
+		if (voucher.discountType === 'percentage') {
+			const discountAmount = (subtotal * voucher.discountValue) / 100;
+			return voucher.maxDiscountAmount
+				? Math.min(discountAmount, voucher.maxDiscountAmount)
+				: discountAmount;
+		} else {
+			return voucher.discountValue;
+		}
+	};
+
+	/**
+	 * Format voucher description
+	 */
+	const formatVoucherDescription = (voucher: any) => {
+		if (voucher.discountType === 'percentage') {
+			const maxDiscount = voucher.maxDiscountAmount
+				? ` (tối đa ${formatPrice(voucher.maxDiscountAmount)})`
+				: '';
+			return `Giảm ${voucher.discountValue}%${maxDiscount}`;
+		} else {
+			return `Giảm ${formatPrice(voucher.discountValue)}`;
+		}
 	};
 
 	/**
@@ -94,6 +156,25 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 		setAppliedDiscount(0);
 		setVoucherValidation(null);
 		toast.info('Đã xóa voucher');
+	};
+
+	/**
+	 * Chọn voucher từ danh sách
+	 */
+	const handleSelectVoucher = (voucher: any) => {
+		const discountAmount = calculateVoucherDiscount(voucher);
+		setDiscountCode(voucher.discountCode);
+		setAppliedDiscount(discountAmount);
+		setVoucherValidation({
+			isValid: true,
+			message: `Áp dụng thành công: ${voucher.discountName}`,
+			discountAmount,
+			voucher,
+		});
+		setShowVoucherList(false);
+		toast.success(`Đã áp dụng voucher: ${voucher.discountName}`, {
+			description: `Giảm ${formatPrice(discountAmount)}`,
+		});
 	};
 
 	const handlePayment = () => {
@@ -166,7 +247,18 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
 			{/* Discount Code */}
 			<div className="bg-[#FAFAFA] border border-gray-200 rounded-md p-4">
-				<h3 className="font-semibold text-sm mb-3">Mã Giảm Giá</h3>
+				<div className="flex items-center justify-between mb-3">
+					<h3 className="font-semibold text-sm">Mã Giảm Giá</h3>
+					{activeVouchers.length > 0 && (
+						<button
+							type="button"
+							onClick={() => setShowVoucherList(!showVoucherList)}
+							className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+						>
+							{showVoucherList ? 'Ẩn danh sách' : 'Xem voucher có sẵn'}
+						</button>
+					)}
+				</div>
 
 				{/* Voucher input form */}
 				<form className="flex gap-2" onSubmit={handleApplyDiscount}>
@@ -193,6 +285,94 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 						)}
 					</button>
 				</form>
+
+				{/* Available Vouchers List */}
+				{showVoucherList && (
+					<div className="mt-3 border-t border-gray-200 pt-3">
+						{isLoadingVouchers ? (
+							<div className="text-center py-4">
+								<div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#C28B1B] mx-auto"></div>
+								<p className="text-xs text-gray-500 mt-2">
+									Đang tải voucher...
+								</p>
+							</div>
+						) : activeVouchers.length === 0 ? (
+							<div className="text-center py-4">
+								<div className="text-gray-400 mb-2">
+									<i className="fas fa-gift text-2xl"></i>
+								</div>
+								<p className="text-xs text-gray-500 font-medium">
+									Chưa có voucher nào được phát hành
+								</p>
+								<p className="text-xs text-gray-400 mt-1">
+									Shop sẽ phát hành voucher trong thời gian sớm nhất
+								</p>
+							</div>
+						) : (
+							<>
+								<h4 className="text-xs font-semibold text-gray-700 mb-2">
+									Voucher có thể sử dụng ({getAvailableVouchers().length})
+								</h4>
+								<div className="space-y-2 max-h-48 overflow-y-auto">
+									{getAvailableVouchers().length > 0 ? (
+										getAvailableVouchers().map((voucher) => (
+											<div
+												key={voucher._id}
+												className="border border-gray-200 rounded-md p-2 bg-white hover:border-[#C28B1B] transition-colors cursor-pointer"
+												onClick={() => handleSelectVoucher(voucher)}
+											>
+												<div className="flex items-center justify-between">
+													<div className="flex-1">
+														<div className="flex items-center gap-2">
+															<span className="text-xs font-semibold text-[#C28B1B]">
+																{voucher.discountCode}
+															</span>
+															<span className="text-xs bg-green-100 text-green-700 px-1 rounded">
+																{voucher.discountType === 'percentage'
+																	? 'Phần trăm'
+																	: 'Số tiền'}
+															</span>
+														</div>
+														<p className="text-xs text-gray-700 mt-1">
+															{voucher.discountName}
+														</p>
+														<p className="text-xs text-gray-500 mt-1">
+															{formatVoucherDescription(voucher)}
+														</p>
+														<p className="text-xs text-gray-400 mt-1">
+															Đơn hàng tối thiểu:{' '}
+															{formatPrice(voucher.minOrderValue)}
+														</p>
+													</div>
+													<div className="text-right">
+														<div className="text-xs font-semibold text-green-600">
+															-{formatPrice(calculateVoucherDiscount(voucher))}
+														</div>
+														<div className="text-xs text-gray-400">
+															{voucher.usedCount}/{voucher.usageLimit || '∞'}
+														</div>
+													</div>
+												</div>
+											</div>
+										))
+									) : (
+										<div className="text-center py-4">
+											<div className="text-gray-400 mb-2">
+												<i className="fas fa-info-circle text-lg"></i>
+											</div>
+											<p className="text-xs text-gray-500">
+												Không có voucher phù hợp với đơn hàng này
+											</p>
+											<p className="text-xs text-gray-400 mt-1">
+												Đơn hàng cần có giá trị tối thiểu để sử dụng voucher
+											</p>
+										</div>
+									)}
+								</div>
+							</>
+						)}
+					</div>
+				)}
 
 				{/* Voucher status */}
 				{voucherValidation && (
@@ -266,23 +446,50 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 				</p>
 
 				{/* Discount Hints - only show if no voucher applied */}
-				{appliedDiscount === 0 && !voucherValidation && (
-					<div className="mt-2 text-[10px] text-gray-500 bg-blue-50 border border-blue-200 rounded p-2">
-						<i className="fas fa-info-circle text-blue-500 mr-1"></i>
-						Thử các mã giảm giá phổ biến:
-						<div className="mt-1 flex flex-wrap gap-1">
-							{['WELCOME10', 'SALE500K', 'VIP15', 'NEWCUSTOMER'].map((code) => (
-								<button
-									key={code}
-									onClick={() => setDiscountCode(code)}
-									className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[9px] hover:bg-blue-200 transition-colors"
-								>
-									{code}
-								</button>
-							))}
+				{appliedDiscount === 0 &&
+					!voucherValidation &&
+					activeVouchers.length === 0 && (
+						<div className="mt-2 text-[10px] text-gray-500 bg-blue-50 border border-blue-200 rounded p-2">
+							<i className="fas fa-info-circle text-blue-500 mr-1"></i>
+							Thử các mã giảm giá phổ biến:
+							<div className="mt-1 flex flex-wrap gap-1">
+								{['WELCOME10', 'SALE500K', 'VIP15', 'NEWCUSTOMER'].map(
+									(code) => (
+										<button
+											key={code}
+											onClick={() => setDiscountCode(code)}
+											className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[9px] hover:bg-blue-200 transition-colors"
+										>
+											{code}
+										</button>
+									)
+								)}
+							</div>
 						</div>
-					</div>
-				)}
+					)}
+
+				{/* Voucher available notification */}
+				{appliedDiscount === 0 &&
+					!voucherValidation &&
+					activeVouchers.length > 0 &&
+					getAvailableVouchers().length > 0 && (
+						<div className="mt-2 text-[10px] text-green-600 bg-green-50 border border-green-200 rounded p-2">
+							<i className="fas fa-gift text-green-500 mr-1"></i>
+							Có {getAvailableVouchers().length} voucher có thể sử dụng cho đơn
+							hàng này!
+						</div>
+					)}
+
+				{/* No vouchers notification */}
+				{appliedDiscount === 0 &&
+					!voucherValidation &&
+					activeVouchers.length === 0 && (
+						<div className="mt-2 text-[10px] text-gray-500 bg-gray-50 border border-gray-200 rounded p-2">
+							<i className="fas fa-info-circle text-gray-400 mr-1"></i>
+							Shop chưa phát hành voucher nào. Hãy theo dõi để nhận thông báo
+							khi có voucher mới!
+						</div>
+					)}
 			</div>
 
 			{/* Payment Button */}

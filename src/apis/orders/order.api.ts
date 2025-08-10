@@ -96,6 +96,27 @@ export interface VoucherValidationResponse {
 	};
 }
 
+export interface ActiveVoucher {
+	_id: string;
+	discountCode: string;
+	discountName: string;
+	discountType: 'percentage' | 'fixed';
+	discountValue: number;
+	startDate: string;
+	endDate: string;
+	minOrderValue: number;
+	maxDiscountAmount?: number;
+	usageLimit?: number;
+	usedCount: number;
+	isActive: boolean;
+	description?: string;
+}
+
+export interface ActiveVouchersResponse {
+	vouchers: ActiveVoucher[];
+	total: number;
+}
+
 // Order API functions
 export const orderApi = {
 	/**
@@ -153,6 +174,25 @@ export const orderApi = {
 				isValid: false,
 				message: error.response?.data?.message || 'Mã voucher không hợp lệ',
 			};
+		}
+	},
+
+	/**
+	 * Lấy danh sách voucher đang hoạt động
+	 */
+	async getActiveVouchers(): Promise<ActiveVouchersResponse> {
+		try {
+			console.log('🎫 Fetching active vouchers...');
+
+			const response = await api.get<ActiveVouchersResponse>(
+				'/vouchers/active'
+			);
+
+			console.log('✅ Active vouchers fetched:', response.data);
+			return response.data;
+		} catch (error: any) {
+			console.error('❌ Failed to fetch active vouchers:', error);
+			throw new Error('Không thể tải danh sách voucher. Vui lòng thử lại.');
 		}
 	},
 
