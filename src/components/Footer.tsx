@@ -1,12 +1,13 @@
 import { Facebook, Instagram, Twitter } from 'lucide-react';
-import React from 'react';
+
 import { Link } from 'react-router-dom';
+import React from 'react';
 
 const Footer: React.FC = () => {
 	return (
 		<footer className="bg-[#3c2f2f] text-[#d9d9d9] text-xs md:text-sm mt-20 py-10 px-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
 			<div>
-				<h5 className="font-semibold mb-3">FAKE STORE</h5>
+				<h5 className="font-semibold mb-3">Fayra</h5>
 				<p>
 					Chuyên cung cấp nhẫn đá quý chất lượng cao, đa dạng mẫu mã và kiểu
 					dáng.
